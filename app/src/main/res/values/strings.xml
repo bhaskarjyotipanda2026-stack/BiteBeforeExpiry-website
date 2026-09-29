@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BiteBeforeExpiry</string>
+    <string name="sub_title">AI-Powered Food Safety &amp; Smart Pantry</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_scan">Scan</string>
+    <string name="nav_pantry">Pantry</string>
+    <string name="nav_history">History</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Dashboard -->
+    <string name="scan_product_cta">Scan Product</string>
+    <string name="todays_attention">Today\'s Attention</string>
+    <string name="use_first">USE FIRST</string>
+    <string name="allergy_alerts">Allergy Alerts</string>
+    <string name="monthly_summary">Monthly Summary</string>
+
+    <!-- Product Statuses -->
+    <string name="status_safe">Safe</string>
+    <string name="status_upcoming">Upcoming</string>
+    <string name="status_use_soon">Use Soon</string>
+    <string name="status_expires_today">Expires Today</string>
+    <string name="status_expired">Expired</string>
+
+    <!-- General Actions -->
+    <string name="btn_save">Save Product</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_try_again">Try Again</string>
+    <string name="btn_view_details">View Details</string>
+</resources>
