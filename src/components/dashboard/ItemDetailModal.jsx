@@ -162,6 +162,7 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
                 </span>
                 <p className="text-xs opacity-80 mt-0.5">
                   Expiry Date: <strong className="font-bold">{item.expiryDate || 'Unknown'}</strong>
+                  {item.mfgDate && <span className="ml-2 font-normal">• Mfg: <strong className="font-bold">{item.mfgDate}</strong></span>}
                 </p>
               </div>
             </div>
@@ -171,6 +172,27 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
               <div className="font-extrabold text-sm">
                 {settings.currencySymbol}{item.estimatedValue || 100}
               </div>
+            </div>
+          </div>
+
+          {/* Dual Date Showcase: Manufacturing & Expiry Dates */}
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+              <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
+                🏭 Manufacturing Date
+              </span>
+              <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                {item.mfgDate || 'Production Batch Record'}
+              </span>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+              <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
+                📅 Real Expiry Date
+              </span>
+              <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                {item.expiryDate || 'Calculated Valid'}
+              </span>
             </div>
           </div>
 

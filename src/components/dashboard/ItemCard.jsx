@@ -110,10 +110,18 @@ export function ItemCard({ item, onClick, onMarkUsed, onMarkWasted }) {
           {item.name}
         </h3>
 
-        {/* Expiry Date Display */}
-        <div className="mt-2.5 flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
-          <Clock className="w-3.5 h-3.5 text-slate-400" />
-          <span>Expires: <strong className="text-slate-800 dark:text-slate-200">{item.expiryDate || 'No date set'}</strong></span>
+        {/* Expiry & Mfg Date Display */}
+        <div className="mt-2.5 space-y-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
+          <div className="flex items-center space-x-1.5">
+            <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <span>Expires: <strong className="text-slate-900 dark:text-slate-100 font-bold">{item.expiryDate || 'No date set'}</strong></span>
+          </div>
+          {item.mfgDate && (
+            <div className="flex items-center space-x-1.5 text-[11px] text-slate-400 dark:text-slate-500">
+              <span className="shrink-0">🏭</span>
+              <span>Mfg: <strong className="font-semibold text-slate-700 dark:text-slate-300">{item.mfgDate}</strong></span>
+            </div>
+          )}
         </div>
 
         {/* Badges row: Urgency + Health Score */}

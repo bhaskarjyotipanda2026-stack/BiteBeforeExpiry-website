@@ -182,6 +182,66 @@ export function extractBarcodeCandidatesFromOcr(ocrText) {
 }
 
 /**
+ * Parses GS1 Barcode identifiers (AI 17 for Expiry Date, AI 11 for Mfg Date, AI 10 for Batch)
+ * Format in GS1-128 / DataMatrix:
+ * - AI (17) YYMMDD -> Expiry Date
+ * - AI (11) YYMMDD -> Mfg Date
+ * - AI (10) LOT/BATCH -> Batch number
+ */
+export function parseGs1Barcode(rawBarcode) {
+  if (!rawBarcode || typeof rawBarcode !== 'string') return {};
+  const clean = rawBarcode.trim();
+
+  const result = {
+    gtin: null,
+    expiryDate: null,
+    mfgDate: null,
+    batchNumber: null
+  };
+
+  // 1. Bracketed format: (01)08901117012345(17)270331(11)240410(10)DL4029
+  const expMatchBracket = clean.match(/\(17\)\s*(\d{6})/);
+  if (expMatchBracket) {
+    const yy = parseInt(expMatchBracket[1].substring(0, 2), 10);
+    const mm = expMatchBracket[1].substring(2, 4);
+    const dd = expMatchBracket[1].substring(4, 6);
+    const fullYear = yy >= 20 ? 2000 + yy : 1900 + yy;
+    result.expiryDate = `${fullYear}-${mm}-${dd}`;
+  }
+
+  const mfgMatchBracket = clean.match(/\(11\)\s*(\d{6})/);
+  if (mfgMatchBracket) {
+    const yy = parseInt(mfgMatchBracket[1].substring(0, 2), 10);
+    const mm = mfgMatchBracket[1].substring(2, 4);
+    const dd = mfgMatchBracket[1].substring(4, 6);
+    const fullYear = yy >= 20 ? 2000 + yy : 1900 + yy;
+    result.mfgDate = `${fullYear}-${mm}-${dd}`;
+  }
+
+  const batchMatchBracket = clean.match(/\(10\)\s*([A-Za-z0-9_-]+)/);
+  if (batchMatchBracket) {
+    result.batchNumber = batchMatchBracket[1];
+  }
+
+  // 2. Unbracketed GS1 string format starting with 01 + 14 digits + 17 + 6 digits
+  const unbracketedMatch = clean.match(/01(\d{14})17(\d{6})(?:10([A-Za-z0-9]+))?/);
+  if (unbracketedMatch) {
+    result.gtin = unbracketedMatch[1];
+    const expStr = unbracketedMatch[2];
+    const yy = parseInt(expStr.substring(0, 2), 10);
+    const mm = expStr.substring(2, 4);
+    const dd = expStr.substring(4, 6);
+    const fullYear = yy >= 20 ? 2000 + yy : 1900 + yy;
+    result.expiryDate = `${fullYear}-${mm}-${dd}`;
+    if (unbracketedMatch[3]) {
+      result.batchNumber = unbracketedMatch[3];
+    }
+  }
+
+  return result;
+}
+
+/**
  * Plays a pleasant optical scanner "beep" chime via Web Audio API
  */
 export function playScannerBeep() {

@@ -29,19 +29,40 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
   // Product Intelligence State (Real Expiry, Composition & Lifespan)
   const [intelligenceData, setIntelligenceData] = useState(scanResult.productIntelligence || null);
 
+  // Synchronize expiryDate and mfgDate if product intelligence contains verified dates
+  useEffect(() => {
+    if (intelligenceData?.expiryInfo) {
+      if (!expiryDate && intelligenceData.expiryInfo.realExpiryDate) {
+        setExpiryDate(intelligenceData.expiryInfo.realExpiryDate);
+      }
+      if (!mfgDate && intelligenceData.expiryInfo.mfgDate) {
+        setMfgDate(intelligenceData.expiryInfo.mfgDate);
+      }
+    }
+  }, [intelligenceData]);
+
   // Lazy generate product intelligence if not already passed from scanner
   useEffect(() => {
     if (!intelligenceData) {
       detectProductIntelligence({
+        barcode: scanResult.barcode || null,
         productName: name,
         frontText: scanResult.rawOcrText || '',
         existingExpiryDate: expiryDate,
         existingMfgDate: mfgDate
       }).then(res => {
-        if (res) setIntelligenceData(res);
+        if (res) {
+          setIntelligenceData(res);
+          if (!expiryDate && res.expiryInfo?.realExpiryDate) {
+            setExpiryDate(res.expiryInfo.realExpiryDate);
+          }
+          if (!mfgDate && res.expiryInfo?.mfgDate) {
+            setMfgDate(res.expiryInfo.mfgDate);
+          }
+        }
       });
     }
-  }, [name, expiryDate, mfgDate, intelligenceData, scanResult.rawOcrText]);
+  }, [name, intelligenceData, scanResult.barcode, scanResult.rawOcrText]);
 
   // Translation State
   const [activeLang, setActiveLang] = useState(scanResult.targetLanguage || settings.preferredLanguage || 'en');

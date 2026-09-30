@@ -7,17 +7,17 @@ import { scanBarcodeFromVideo, scanBarcodeFromImageSource, playScannerBeep } fro
 
 const SAMPLE_REAL_BARCODES = [
   // Food & Ingredients
-  { code: '3017620422003', name: 'Nutella Hazelnut Spread', category: 'grocery', icon: '🍫', db: 'Open Food Facts' },
-  { code: '0013000006030', name: 'Heinz Tomato Ketchup', category: 'grocery', icon: '🥫', db: 'Open Food Facts' },
-  { code: '0030000010204', name: 'Quaker Whole Rolled Oats', category: 'grocery', icon: '🥣', db: 'Open Food Facts' },
-  { code: '8076809513753', name: 'Barilla Penne Rigate', category: 'grocery', icon: '🍝', db: 'Open Food Facts' },
+  { code: '3017620422003', name: 'Nutella Hazelnut Spread', category: 'grocery', icon: '🍫', db: 'Open Food Facts', dates: 'Exp: 14 Jul 2025 • Mfg: 15 Jul 2024' },
+  { code: '0013000006030', name: 'Heinz Tomato Ketchup', category: 'grocery', icon: '🥫', db: 'Open Food Facts', dates: 'Exp: 10 Aug 2025 • Mfg: 10 May 2024' },
+  { code: '0030000010204', name: 'Quaker Whole Rolled Oats', category: 'grocery', icon: '🥣', db: 'Open Food Facts', dates: 'Exp: 31 May 2025 • Mfg: 01 Jun 2024' },
+  { code: '8076809513753', name: 'Barilla Penne Rigate', category: 'grocery', icon: '🍝', db: 'Open Food Facts', dates: 'Exp: 09 Mar 2026 • Mfg: 10 Mar 2024' },
   // Medicines & Pharmaceuticals
-  { code: '8901117012345', name: 'Dolo 650 (Paracetamol)', category: 'medicine', icon: '💊', db: 'Pharma / OpenFDA' },
-  { code: '300450449107', name: 'Tylenol Extra Strength 500mg', category: 'medicine', icon: '💊', db: 'U.S. FDA Drug DB' },
-  { code: '8901117098765', name: 'Augmentin 625 Duo (Amoxicillin)', category: 'medicine', icon: '💉', db: 'Pharma / OpenFDA' },
-  { code: '8901234567890', name: 'Crocin Advance (Paracetamol)', category: 'medicine', icon: '💊', db: 'GSK Pharma DB' },
-  { code: '305730164402', name: 'Advil Liqui-Gels (Ibuprofen)', category: 'medicine', icon: '💊', db: 'U.S. FDA Drug DB' },
-  { code: '8901030000049', name: 'Ciplox Eye Drops (Ciprofloxacin)', category: 'medicine', icon: '👁️', db: 'Cipla Pharma DB' }
+  { code: '8901117012345', name: 'Dolo 650 (Paracetamol)', category: 'medicine', icon: '💊', db: 'Micro Labs Pharma', dates: 'Exp: 31 Mar 2027 • Mfg: 10 Apr 2024' },
+  { code: '300450449107', name: 'Tylenol Extra Strength 500mg', category: 'medicine', icon: '💊', db: 'U.S. FDA Drug DB', dates: 'Exp: 31 Jan 2027 • Mfg: 15 Feb 2024' },
+  { code: '8901117098765', name: 'Augmentin 625 Duo (Amoxicillin)', category: 'medicine', icon: '💉', db: 'GSK Pharma DB', dates: 'Exp: 31 Jul 2026 • Mfg: 01 Aug 2024' },
+  { code: '8901234567890', name: 'Crocin Advance (Paracetamol)', category: 'medicine', icon: '💊', db: 'GSK Pharma DB', dates: 'Exp: 30 Apr 2026 • Mfg: 12 May 2024' },
+  { code: '305730164402', name: 'Advil Liqui-Gels (Ibuprofen)', category: 'medicine', icon: '💊', db: 'U.S. FDA Drug DB', dates: 'Exp: 31 May 2026 • Mfg: 20 Jun 2024' },
+  { code: '8901030000049', name: 'Ciplox Eye Drops (Ciprofloxacin)', category: 'medicine', icon: '👁️', db: 'Cipla Pharma DB', dates: 'Exp: 31 Aug 2026 • Mfg: 01 Sep 2024' }
 ];
 
 export function BarcodeScannerModal({ isOpen, onClose, onBarcodeDetected }) {
@@ -427,6 +427,12 @@ export function BarcodeScannerModal({ isOpen, onClose, onBarcodeDetected }) {
                         {sample.db}
                       </span>
                     </div>
+                    {sample.dates && (
+                      <div className="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-400 mt-1 flex items-center space-x-1">
+                        <span>🗓️</span>
+                        <span>{sample.dates}</span>
+                      </div>
+                    )}
                   </div>
                 </button>
               ))}

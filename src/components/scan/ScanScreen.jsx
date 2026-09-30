@@ -68,8 +68,9 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
       onAnalysisComplete({
         name: intel.verifiedName,
         type: intel.productType,
-        expiryDate: intel.expiryInfo.realExpiryDate || '',
-        mfgDate: intel.expiryInfo.mfgDate || '',
+        expiryDate: intel.expiryInfo?.realExpiryDate || '',
+        mfgDate: intel.expiryInfo?.mfgDate || '',
+        barcode: intel.barcode || null,
         ingredientsOriginal: intel.openFoodFactsData?.ingredientsList || intel.composition?.primaryRawMaterials?.map(m => m.name) || [],
         rawOcrText: `Product API Lookup: ${intel.verifiedName}\nBarcode: ${intel.barcode || 'N/A'}\n${intel.composition?.summary || ''}`,
         frontImage: intel.openFoodFactsData?.productImage || null,
