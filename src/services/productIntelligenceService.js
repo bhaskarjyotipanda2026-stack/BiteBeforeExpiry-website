@@ -8,6 +8,7 @@
  */
 
 import { extractExpiryDate, extractMfgDate, extractIngredients, inferProductType, extractProductName } from './parserService';
+import { fetchFromOpenFDA, COMPREHENSIVE_MEDICINE_DATABASE } from './medicineDatasetService';
 
 // Open Food Facts API Base URLs
 const OFF_API_PRODUCT_URL = 'https://world.openfoodfacts.org/api/v2/product';
@@ -546,25 +547,50 @@ export async function detectProductIntelligence({
   existingMfgDate = null
 }) {
   const combinedText = `${productName} ${frontText} ${backText} ${rawOcrText}`.trim();
+  const cleanBarcode = barcode && /^\d{8,14}$/.test(barcode.trim()) ? barcode.trim() : null;
 
-  // 1. Try querying Open Food Facts API (if barcode exists or if product name is recognized)
+  // 1. Query Real Datasets: Open Food Facts (Groceries) & OpenFDA / Medical DB (Medicines)
   let offData = null;
-  if (barcode && /^\d{8,14}$/.test(barcode.trim())) {
-    offData = await fetchFromOpenFoodFacts(barcode.trim());
-  } else if (productName && productName !== 'Scanned Product' && productName !== 'Scanned Medicine') {
-    offData = await fetchFromOpenFoodFacts(productName);
+  let medicineData = null;
+
+  // Check if query or text indicates medicine
+  const isMedicineHint = inferProductType(combinedText) === 'medicine' || 
+    /\b(?:tablet|capsule|syrup|drop|suspension|mg|mcg|paracetamol|dolo|crocin|advil|tylenol|augmentin|amoxicillin|antibiotic|dosage|pharma|fda)\b/i.test(combinedText);
+
+  if (isMedicineHint) {
+    // Try medicine dataset first
+    if (cleanBarcode) {
+      medicineData = await fetchFromOpenFDA(cleanBarcode);
+    }
+    if (!medicineData && productName && productName !== 'Scanned Product' && productName !== 'Scanned Medicine') {
+      medicineData = await fetchFromOpenFDA(productName);
+    }
+  }
+
+  // If not medicine or medicine not found, try Open Food Facts
+  if (!medicineData) {
+    if (cleanBarcode) {
+      offData = await fetchFromOpenFoodFacts(cleanBarcode);
+      // If OFF had no hit for this barcode, try medicine dataset as fallback
+      if (!offData) {
+        medicineData = await fetchFromOpenFDA(cleanBarcode);
+      }
+    } else if (productName && productName !== 'Scanned Product' && productName !== 'Scanned Medicine') {
+      offData = await fetchFromOpenFoodFacts(productName);
+      if (!offData) {
+        medicineData = await fetchFromOpenFDA(productName);
+      }
+    }
   }
 
   // 2. Real Expiry Date Detection
-  // Check in priority order:
-  // a) Explicit printed expiry detected by OCR
   const ocrExpDate = extractExpiryDate(combinedText);
   const ocrMfgDate = extractMfgDate(combinedText);
 
   let realExpiryDate = existingExpiryDate || ocrExpDate || null;
   let realMfgDate = existingMfgDate || ocrMfgDate || null;
   let isRealPrintedExpiry = false;
-  let detectionSource = 'Optical Package OCR';
+  let detectionSource = medicineData ? (medicineData.source || 'Pharmaceutical Database') : 'Optical Package OCR';
   let confidence = 'high';
 
   if (ocrExpDate) {
@@ -573,7 +599,6 @@ export async function detectProductIntelligence({
     detectionSource = 'Verified Package OCR Date';
     confidence = 'high';
   } else if (offData && offData.expirationDateRaw) {
-    // Open Food Facts sometimes provides standard expiration date format
     const parsedOffDate = extractExpiryDate(offData.expirationDateRaw);
     if (parsedOffDate) {
       realExpiryDate = parsedOffDate;
@@ -585,7 +610,7 @@ export async function detectProductIntelligence({
 
   // If still no expiry date found, calculate scientific expected expiry from Mfg date + Lifespan profile
   if (!realExpiryDate && realMfgDate) {
-    const lifespanPreview = analyzeProductLifespan(productName || offData?.productName || 'Grocery', combinedText);
+    const lifespanPreview = analyzeProductLifespan(productName || medicineData?.brandName || offData?.productName || 'Grocery', combinedText);
     const mfg = new Date(realMfgDate);
     mfg.setDate(mfg.getDate() + lifespanPreview.totalLifespanDays);
     realExpiryDate = mfg.toISOString().split('T')[0];
@@ -624,30 +649,68 @@ export async function detectProductIntelligence({
   }
 
   // 3. Product Composition ("What it is made up of")
-  const ingredientsList = offData?.ingredientsList?.length > 0 
-    ? offData.ingredientsList 
-    : extractIngredients(combinedText);
+  let composition;
+  if (medicineData) {
+    composition = {
+      summary: `${medicineData.brandName} is a pharmaceutical formulation containing ${medicineData.activeIngredients?.join(', ')}.`,
+      primaryRawMaterials: medicineData.activeIngredients?.map(act => ({
+        name: act,
+        origin: 'Active Pharmaceutical Ingredient (USP/BP/IP)',
+        role: medicineData.drugClass || 'Therapeutic Active Agent',
+        icon: '💊'
+      })) || [],
+      allergens: [],
+      additives: [],
+      sourceOrigins: [medicineData.manufacturer || 'Licensed Pharmaceutical Laboratory'],
+      activeCompounds: medicineData.activeIngredients || [],
+      drugClass: medicineData.drugClass,
+      dosageForm: medicineData.dosageForm,
+      indications: medicineData.indications
+    };
+  } else {
+    const ingredientsList = offData?.ingredientsList?.length > 0 
+      ? offData.ingredientsList 
+      : extractIngredients(combinedText);
 
-  const composition = analyzeProductComposition(
-    ingredientsList,
-    productName || offData?.productName || '',
-    combinedText,
-    offData
-  );
+    composition = analyzeProductComposition(
+      ingredientsList,
+      productName || offData?.productName || '',
+      combinedText,
+      offData
+    );
+  }
 
   // 4. Product Lifespan & Shelf Life
-  const lifespan = analyzeProductLifespan(
-    productName || offData?.productName || '',
+  const resolvedName = medicineData?.brandName || offData?.productName || productName || extractProductName(combinedText);
+  let lifespan = analyzeProductLifespan(
+    resolvedName,
     combinedText,
     realMfgDate,
     realExpiryDate
   );
 
+  if (medicineData) {
+    lifespan = {
+      ...lifespan,
+      category: 'Pharmaceuticals & Medicines',
+      storageProtocol: medicineData.storageInstructions || lifespan.storageProtocol,
+      degradationProfile: medicineData.postExpiryRisks || lifespan.degradationProfile,
+      disposalGuidelines: medicineData.disposalGuidelines,
+      periodAfterOpening: medicineData.openedLifespanDays 
+        ? `Strictly discard within ${medicineData.openedLifespanDays} days once opened!` 
+        : lifespan.periodAfterOpening
+    };
+  }
+
+  const determinedType = medicineData ? 'medicine' : (offData ? 'grocery' : inferProductType(combinedText));
+
   return {
-    verifiedName: offData?.productName || productName || extractProductName(combinedText),
-    barcode: barcode || offData?.barcode || null,
-    productType: inferProductType(combinedText),
+    verifiedName: resolvedName,
+    barcode: cleanBarcode || medicineData?.barcode || offData?.barcode || null,
+    productType: determinedType,
     openFoodFactsData: offData,
+    medicineData: medicineData,
+    realDatasetSource: medicineData?.source || (offData ? 'Open Food Facts Database' : null),
     
     // 1. REAL EXPIRY DATE DETAILS
     expiryInfo: {

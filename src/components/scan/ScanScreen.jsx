@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Camera, Upload, Sparkles, AlertCircle, FileText, ArrowRight, 
-  HelpCircle, RefreshCw, CheckCircle, Languages, Loader2, Info, ChefHat, Eye
+  HelpCircle, RefreshCw, CheckCircle, Languages, Loader2, Info, ChefHat, Eye,
+  Barcode as BarcodeIcon, Pill, Utensils, Zap, ShieldCheck
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { SUPPORTED_LANGUAGES } from '../../constants';
@@ -10,8 +11,10 @@ import { performOcr } from '../../services/ocrService';
 import { parsePackageData } from '../../services/parserService';
 import { translateIngredientsList } from '../../services/translationService';
 import { detectProductIntelligence } from '../../services/productIntelligenceService';
+import { extractBarcodeCandidatesFromOcr } from '../../services/barcodeScannerService';
 import { CameraCaptureModal } from '../common/CameraCaptureModal';
 import { PantryVisionScannerModal } from '../recipes/PantryVisionScannerModal';
+import { BarcodeScannerModal } from './BarcodeScannerModal';
 
 export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateToRecipes }) {
   const { settings, showToast } = useApp();
@@ -29,6 +32,7 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
   // Barcode & Product Intelligence API search state
   const [barcodeInput, setBarcodeInput] = useState('');
   const [isQueryingApi, setIsQueryingApi] = useState(false);
+  const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
 
   // Camera modal state
   const [cameraModal, setCameraModal] = useState({ isOpen: false, target: 'front' });
@@ -179,12 +183,16 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
         translated[selectedLanguage] = transList;
       }
 
-      setAnalysisStatus('Connecting to Product Intelligence API (validating expiry, composition & lifespan)...');
+      setAnalysisStatus('Connecting to Real Dataset Intelligence (validating expiry, composition & lifespan)...');
       setProgressPercent(92);
 
-      // Run Product Intelligence API detection
+      // Extract any barcode candidate numbers printed on packaging (from OCR text)
+      const ocrBarcodes = extractBarcodeCandidatesFromOcr(`${frontText}\n${backText}\n${parsedData.rawOcrText}`);
+      const detectedBarcode = barcodeInput || ocrBarcodes[0] || null;
+
+      // Run Product Intelligence API detection (Open Food Facts + OpenFDA / Medicine DB)
       const productIntelligence = await detectProductIntelligence({
-        barcode: barcodeInput || null,
+        barcode: detectedBarcode,
         productName: parsedData.name,
         frontText,
         backText,
@@ -267,25 +275,77 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
         </p>
       </div>
 
-      {/* NEW: Direct Barcode & Product Intelligence API Search Box */}
-      <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-slate-800 shadow-lg shadow-emerald-600/5">
+      {/* HERO: Live Barcode & Real Dataset Scanner Card */}
+      <div className="mb-8 p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-700 text-white shadow-xl shadow-teal-900/10 relative overflow-hidden">
+        <div className="absolute -right-8 -bottom-8 w-44 h-44 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+        
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
+          <div className="space-y-2 max-w-xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/20 text-white backdrop-blur-md">
+                ⚡ Instant Optical & Barcode Engine
+              </span>
+              <span className="text-[10px] font-bold text-emerald-100 bg-black/20 px-2 py-0.5 rounded-full">
+                Real Datasets Connected
+              </span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-black text-white">
+              Live Camera Barcode & Dataset Scanner
+            </h2>
+
+            <p className="text-xs sm:text-sm text-emerald-50 leading-relaxed">
+              Aim your camera at any food or medicine barcode/label. Automatically identifies products from <strong>Open Food Facts (3.2M+ Foods)</strong> and the <strong>U.S. FDA Drug Labeling Database</strong> to detect real active ingredients, true shelf-life, and post-expiry toxicity warnings.
+            </p>
+
+            <div className="flex flex-wrap gap-2 pt-1 text-[11px] font-bold text-white/90">
+              <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-black/20 backdrop-blur-md">
+                <span>🥫</span>
+                <span>Groceries & Ingredients</span>
+              </span>
+              <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-black/20 backdrop-blur-md">
+                <span>💊</span>
+                <span>Medicines & Pharmaceuticals</span>
+              </span>
+              <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-black/20 backdrop-blur-md">
+                <span>🔔</span>
+                <span>Laser Aim & Scanner Chime</span>
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 shrink-0">
+            <button
+              onClick={() => setIsBarcodeScannerOpen(true)}
+              className="px-6 py-3.5 rounded-2xl bg-white hover:bg-emerald-50 text-slate-900 font-black text-sm shadow-xl shadow-black/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2.5"
+            >
+              <Camera className="w-5 h-5 text-emerald-600" />
+              <span>Launch Live Barcode Camera</span>
+            </button>
+
+            <div className="text-center text-[10px] text-emerald-100 font-semibold">
+              Supports UPC-A, EAN-13, Code-128 & NDC codes
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Manual Search & Quick Test Barcode Bar */}
+      <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md shadow-slate-100 dark:shadow-none">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold text-sm">
-              API
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold text-sm">
+              <BarcodeIcon className="w-4 h-4" />
             </div>
             <div>
               <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-                Detect via Product Intelligence API (Barcode or Name)
+                Direct Barcode / Product Search
               </h3>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Queries Open Food Facts & Pharmaceutical databases for real expiry, composition & lifespan
+                Type any barcode number or product name to query the real datasets directly
               </p>
             </div>
           </div>
-          <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 self-start sm:self-auto">
-            Zero Photo Required
-          </span>
         </div>
 
         <form onSubmit={(e) => { e.preventDefault(); handleBarcodeOrApiLookup(); }} className="flex flex-col sm:flex-row gap-2">
@@ -294,38 +354,39 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
               type="text"
               value={barcodeInput}
               onChange={(e) => setBarcodeInput(e.target.value)}
-              placeholder="Enter Barcode (e.g. 8901262010019) or Product Name (e.g. Amul Milk, Dolo 650, Nutella)..."
+              placeholder="Enter Barcode (e.g. 300450449107, 8901117012345, Nutella, Dolo 650)..."
               className="w-full px-4 py-2.5 text-xs sm:text-sm font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
             />
           </div>
           <button
             type="submit"
             disabled={isQueryingApi || !barcodeInput.trim()}
-            className="flex items-center justify-center space-x-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-40 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all shrink-0"
+            className="flex items-center justify-center space-x-2 px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all shrink-0"
           >
             {isQueryingApi ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Querying API...</span>
+                <span>Querying Real Datasets...</span>
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                <span>Detect via API</span>
+                <span>Search Real Dataset</span>
               </>
             )}
           </button>
         </form>
 
-        {/* 1-Click Fast API Test Barcodes */}
+        {/* 1-Click Fast Real Dataset Test Presets */}
         <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-          <span className="text-[11px] font-bold text-slate-400 mr-1">Quick API Test Codes:</span>
+          <span className="text-[11px] font-bold text-slate-400 mr-1">Sample Real Datasets:</span>
           {[
-            { label: '🥛 Amul Milk', code: '8901262010019' },
-            { label: '🍫 Nutella Spread', code: '3017620422003' },
-            { label: '💊 Dolo 650', code: 'Dolo 650 Tablets' },
-            { label: '🌾 Quaker Oats', code: 'Quaker Rolled Oats' },
-            { label: '🥫 Heinz Ketchup', code: 'Heinz Tomato Ketchup' }
+            { label: '🍫 Nutella (Food DB)', code: '3017620422003' },
+            { label: '🥫 Heinz Ketchup (Food DB)', code: '0013000006030' },
+            { label: '💊 Dolo 650 (Pharma DB)', code: '8901117012345' },
+            { label: '💊 Tylenol (FDA DB)', code: '300450449107' },
+            { label: '💉 Augmentin (Pharma DB)', code: '8901117098765' },
+            { label: '👁️ Ciplox Eye Drops (Pharma DB)', code: '8901030000049' }
           ].map((item, idx) => (
             <button
               key={idx}
@@ -633,6 +694,17 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
         onClose={() => setIsPantryScannerOpen(false)}
         onIngredientsConfirmed={(items) => {
           if (onNavigateToRecipes) onNavigateToRecipes();
+        }}
+      />
+
+      {/* Live Barcode & Real Dataset Scanner Modal */}
+      <BarcodeScannerModal
+        isOpen={isBarcodeScannerOpen}
+        onClose={() => setIsBarcodeScannerOpen(false)}
+        onBarcodeDetected={(code) => {
+          setIsBarcodeScannerOpen(false);
+          setBarcodeInput(code);
+          handleBarcodeOrApiLookup(code);
         }}
       />
 

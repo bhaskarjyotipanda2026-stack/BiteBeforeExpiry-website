@@ -9,7 +9,9 @@ export function ProductIntelligenceCard({ intelligenceData, isCompact = false })
 
   if (!intelligenceData) return null;
 
-  const { expiryInfo, composition, lifespan, openFoodFactsData, verifiedName } = intelligenceData;
+  const { expiryInfo, composition, lifespan, openFoodFactsData, medicineData, realDatasetSource, verifiedName } = intelligenceData;
+
+  const isMedicine = !!medicineData || intelligenceData.productType === 'medicine';
 
   // Lifespan progress color
   const percent = lifespan?.remainingLifespanPercent ?? 50;
@@ -24,27 +26,35 @@ export function ProductIntelligenceCard({ intelligenceData, isCompact = false })
   };
 
   return (
-    <div className="rounded-3xl border border-emerald-200/80 dark:border-slate-800 bg-white dark:bg-slate-850 shadow-md shadow-slate-100 dark:shadow-none overflow-hidden transition-all">
+    <div className={`rounded-3xl border shadow-md overflow-hidden transition-all ${
+      isMedicine 
+        ? 'border-indigo-200/90 dark:border-indigo-900/60 bg-white dark:bg-slate-850 shadow-indigo-100/50' 
+        : 'border-emerald-200/80 dark:border-slate-800 bg-white dark:bg-slate-850 shadow-slate-100'
+    }`}>
       
       {/* Header Bar */}
-      <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white flex items-center justify-between">
+      <div className={`p-4 sm:p-5 text-white flex items-center justify-between ${
+        isMedicine
+          ? 'bg-gradient-to-r from-blue-700 via-indigo-600 to-indigo-800'
+          : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700'
+      }`}>
         <div className="flex items-center space-x-2.5">
           <div className="w-9 h-9 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shrink-0">
-            <Sparkles className="w-5 h-5 text-emerald-200" />
+            {isMedicine ? <HeartPulse className="w-5 h-5 text-blue-200" /> : <Sparkles className="w-5 h-5 text-emerald-200" />}
           </div>
           <div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-white/20 text-white">
-                Product Intelligence API
+                {isMedicine ? '💊 Verified Medicine Dataset' : '🥫 Verified Food Dataset'}
               </span>
-              {openFoodFactsData && (
-                <span className="text-[10px] font-bold text-emerald-100 hidden sm:inline">
-                  • Open Food Facts Verified
+              {(realDatasetSource || openFoodFactsData?.source) && (
+                <span className="text-[10px] font-bold text-white/90 bg-black/20 px-2 py-0.5 rounded-md">
+                  • {realDatasetSource || openFoodFactsData?.source}
                 </span>
               )}
             </div>
             <h3 className="text-sm sm:text-base font-extrabold text-white mt-0.5">
-              Real Expiry Date, Composition & Lifespan
+              {isMedicine ? 'Active Chemical Formula, Shelf-Life & Medical Safety' : 'Real Expiry Date, Composition & Lifespan'}
             </h3>
           </div>
         </div>
@@ -241,17 +251,57 @@ export function ProductIntelligenceCard({ intelligenceData, isCompact = false })
 
             {/* Active Compounds & Medicine Ingredients (if applicable) */}
             {composition.activeCompounds && composition.activeCompounds.length > 0 && (
-              <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800">
-                <span className="text-[10px] font-black uppercase text-teal-800 dark:text-teal-300 block mb-1">
-                  💊 Active Therapeutic Compounds:
+              <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
+                <span className="text-[10px] font-black uppercase text-indigo-800 dark:text-indigo-300 block mb-1">
+                  💊 Active Pharmaceutical Compounds & Strength:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {composition.activeCompounds.map((act, i) => (
-                    <span key={i} className="text-xs font-bold px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 text-teal-900 dark:text-teal-200 border border-teal-300 dark:border-teal-700">
+                    <span key={i} className="text-xs font-bold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-indigo-900 dark:text-indigo-200 border border-indigo-300 dark:border-indigo-700 shadow-sm">
                       {act}
                     </span>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Drug Indications & Classification (if medicine) */}
+            {(composition.drugClass || composition.indications) && (
+              <div className="p-3 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 space-y-1">
+                {composition.drugClass && (
+                  <div className="text-xs font-bold text-blue-900 dark:text-blue-200">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-400 block">Pharmacological Class:</span>
+                    {composition.drugClass} {composition.dosageForm ? `(${composition.dosageForm})` : ''}
+                  </div>
+                )}
+                {composition.indications && (
+                  <p className="text-[11px] text-blue-800 dark:text-blue-300 leading-relaxed pt-0.5">
+                    <strong>Medical Indications:</strong> {composition.indications}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Post-Expiry Danger Warning */}
+            {lifespan.degradationProfile && (
+              <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/70">
+                <div className="flex items-center space-x-1.5 text-xs font-black uppercase text-rose-800 dark:text-rose-300 mb-1">
+                  <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+                  <span>Post-Expiry Risk & Degradation Warning:</span>
+                </div>
+                <p className="text-xs font-medium text-rose-950 dark:text-rose-200 leading-relaxed">
+                  {lifespan.degradationProfile}
+                </p>
+              </div>
+            )}
+
+            {/* Safe Disposal Guidelines */}
+            {lifespan.disposalGuidelines && (
+              <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300">
+                <strong className="text-slate-900 dark:text-white block text-[10px] uppercase font-black mb-0.5">
+                  ♻️ Safe Disposal Recommendation:
+                </strong>
+                {lifespan.disposalGuidelines}
               </div>
             )}
 

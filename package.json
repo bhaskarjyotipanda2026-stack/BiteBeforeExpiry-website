@@ -9,11 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@zxing/browser": "^0.2.1",
+    "@zxing/library": "^0.23.0",
+    "canvas-confetti": "^1.9.4",
+    "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "lucide-react": "^0.469.0",
-    "tesseract.js": "^5.1.1",
-    "canvas-confetti": "^1.9.4"
+    "tesseract.js": "^5.1.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
