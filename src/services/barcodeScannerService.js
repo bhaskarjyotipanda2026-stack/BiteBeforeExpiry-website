@@ -6,7 +6,8 @@
  * 3. OCR Digit Pattern Extractor (for barcode numbers printed on packaging)
  */
 
-import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
+import { BrowserMultiFormatReader } from '@zxing/browser';
+import { NotFoundException } from '@zxing/library';
 
 let zxingReader = null;
 
@@ -67,15 +68,15 @@ export async function scanBarcodeFromVideo(videoElement) {
     const canvas = document.createElement('canvas');
     canvas.width = videoElement.videoWidth || 640;
     canvas.height = videoElement.videoHeight || 480;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (ctx) {
       ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
       const result = reader.decodeFromCanvas(canvas);
       if (result) {
         playScannerBeep();
         return {
-          rawValue: result.getText(),
-          format: result.getBarcodeFormat().toString(),
+          rawValue: result.getText ? result.getText() : result.text,
+          format: result.getBarcodeFormat ? result.getBarcodeFormat().toString() : 'BARCODE',
           source: 'zxing_engine'
         };
       }
@@ -121,14 +122,21 @@ export async function scanBarcodeFromImageSource(imageSource) {
   // 2. Fallback to ZXing
   try {
     const reader = getZxingReader();
-    const result = await reader.decodeFromImageElement(img);
-    if (result) {
-      playScannerBeep();
-      return {
-        rawValue: result.getText(),
-        format: result.getBarcodeFormat().toString(),
-        source: 'zxing_engine'
-      };
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth || img.width || 640;
+    canvas.height = img.naturalHeight || img.height || 480;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (ctx) {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const result = reader.decodeFromCanvas(canvas);
+      if (result) {
+        playScannerBeep();
+        return {
+          rawValue: result.getText ? result.getText() : result.text,
+          format: result.getBarcodeFormat ? result.getBarcodeFormat().toString() : 'BARCODE',
+          source: 'zxing_engine'
+        };
+      }
     }
   } catch (err) {
     if (!(err instanceof NotFoundException)) {

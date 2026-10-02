@@ -63,21 +63,47 @@ export function OcrLabelScannerModal({ isOpen, onClose, onLabelParsed, initialBa
     }
 
     try {
-      const constraints = {
-        video: {
-          facingMode: { ideal: cameraFacing },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: false
-      };
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera not supported');
+      }
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      let stream = null;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: cameraFacing },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        });
+      } catch (e) {
+        console.warn('High-res camera constraints rejected, falling back:', e);
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: cameraFacing },
+            audio: false
+          });
+        } catch (e2) {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+          });
+        }
+      }
+
       streamRef.current = stream;
 
       if (videoRef.current) {
+        videoRef.current.setAttribute('playsinline', 'true');
+        videoRef.current.setAttribute('webkit-playsinline', 'true');
+        videoRef.current.muted = true;
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+        try {
+          await videoRef.current.play();
+        } catch (playErr) {
+          console.warn('Video play delayed/interrupted:', playErr);
+        }
       }
 
       const track = stream.getVideoTracks()[0];

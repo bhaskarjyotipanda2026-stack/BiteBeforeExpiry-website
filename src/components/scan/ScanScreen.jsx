@@ -121,17 +121,34 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
 
     // Combine Barcode + OCR Information
     const combined = {
+      ...ocrResult,
       name: barcodeIdentifiedItem?.name || ocrResult.name || 'Scanned Product',
       brand: barcodeIdentifiedItem?.brand || ocrResult.brand || '',
       category: barcodeIdentifiedItem?.category || (ocrResult.type === 'medicine' ? 'Tablets & Capsules' : 'Dairy & Milk Products'),
       type: barcodeIdentifiedItem?.type || ocrResult.type || 'grocery',
-      barcode: barcodeIdentifiedItem?.barcode || null,
+      barcode: barcodeIdentifiedItem?.barcode || ocrResult.barcode || null,
       mfgDate: ocrResult.mfgDate || barcodeIdentifiedItem?.mfgDate || '',
+      rawMfgDate: ocrResult.rawMfgDate || null,
+      mfgDateLabel: ocrResult.mfgDateLabel || 'Manufacturing Date — Read from Package',
       expiryDate: ocrResult.expiryDate || barcodeIdentifiedItem?.expiryDate || '',
+      rawExpiryDate: ocrResult.rawExpiryDate || null,
+      expiryDateLabel: ocrResult.expiryDateLabel || (ocrResult.expiryDate ? 'Expiry Date — Read from Package' : 'Not available'),
       isCalculatedDate: ocrResult.isCalculatedDate || false,
       calculationNote: ocrResult.calculationNote || null,
       bestBeforePeriod: ocrResult.bestBeforePeriod || null,
       batchNumber: ocrResult.batchNumber || barcodeIdentifiedItem?.batchNumber || null,
+      batchNumberLabel: ocrResult.batchNumberLabel || (ocrResult.batchNumber ? 'Batch/Lot — Read from Package' : 'Not available'),
+      netQuantity: ocrResult.netQuantity || barcodeIdentifiedItem?.packSize || null,
+      packSize: ocrResult.netQuantity || barcodeIdentifiedItem?.packSize || null,
+      mrp: ocrResult.mrp || null,
+      manufacturer: ocrResult.manufacturerInfo || barcodeIdentifiedItem?.manufacturer || null,
+      countryOrMarket: ocrResult.countryOrMarket || barcodeIdentifiedItem?.countryOfOrigin || 'India',
+      storageInfo: ocrResult.storageInfo || barcodeIdentifiedItem?.storageInfo || null,
+      dateValidation: ocrResult.dateValidation || null,
+      realExpiryStatus: ocrResult.realExpiryStatus || null,
+      fieldConfidences: ocrResult.fieldConfidences || {},
+      confidenceScore: ocrResult.confidenceScore || 0,
+      fieldVerificationStatuses: ocrResult.fieldVerificationStatuses || {},
       ingredientsOriginal: (ocrResult.ingredientsOriginal && ocrResult.ingredientsOriginal.length > 0)
         ? ocrResult.ingredientsOriginal
         : (barcodeIdentifiedItem?.ingredientsOriginal || []),
@@ -165,7 +182,7 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
       try {
         const googleKey = settings.apiKeys?.googleVisionApiKey;
         const ocrRes = await performOcr(dataUrl, { googleVisionApiKey: googleKey });
-        const parsed = parsePackageData('', ocrRes.text);
+        const parsed = parsePackageData(ocrRes.text, '');
         handleLabelParsed({
           ...parsed,
           labelImage: dataUrl,
@@ -310,25 +327,7 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
       setProgressPercent(100);
       setAnalysisStatus('Complete!');
 
-      // Check edge case: IF NO EXPIRY DATE IS FOUND -> Route to Undated Item flow
-      if (!parsedData.hasExpiryFound) {
-        setIsAnalyzing(false);
-        showToast('No printed expiry date detected! Redirecting to Undated Item assistant...', 'info');
-        
-        onOpenUndatedModal({
-          name: parsedData.name !== 'Scanned Product' && parsedData.name !== 'Scanned Medicine' ? parsedData.name : '',
-          type: parsedData.type,
-          frontImage,
-          backImage,
-          rawOcrText: parsedData.rawOcrText,
-          ingredientsOriginal: parsedData.ingredientsOriginal,
-          ingredientsTranslated: translated,
-          productIntelligence
-        });
-        return;
-      }
-
-      // Package successfully parsed with expiry date & product intelligence!
+      // Package parsed with real OCR & product intelligence
       onAnalysisComplete({
         ...parsedData,
         frontImage,
@@ -340,13 +339,21 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
 
     } catch (err) {
       console.error('Scan analysis error:', err);
-      showToast('OCR analysis encountered an issue. You can try another photo or enter manually.', 'warning');
+      showToast('OCR analysis encountered an issue. Opening verification screen with captured images.', 'warning');
       
-      // Fallback route to undated/manual flow so user is never blocked
-      onOpenUndatedModal({
+      // Fallback route directly to Product Detail & Verification screen so user is never blocked
+      onAnalysisComplete({
+        name: 'Scanned Product',
+        type: 'grocery',
         frontImage,
         backImage,
-        rawOcrText: 'OCR could not read text cleanly'
+        rawOcrText: 'OCR could not read text cleanly. Please inspect package and verify values below.',
+        expiryDate: '',
+        mfgDate: '',
+        batchNumber: '',
+        ingredientsOriginal: [],
+        confidenceScore: 30,
+        fieldConfidences: { expiry: 0, mfg: 0, batch: 0, ingredients: 0 }
       });
     } finally {
       setIsAnalyzing(false);

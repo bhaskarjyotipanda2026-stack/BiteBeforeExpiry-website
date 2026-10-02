@@ -28,18 +28,42 @@ export function CameraCaptureModal({ isOpen, onClose, onCapture, label = 'Packag
         throw new Error('Camera access is not supported by your browser.');
       }
 
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: facingMode },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: false
-      });
+      let mediaStream = null;
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: facingMode },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        });
+      } catch (e) {
+        console.warn('High-res camera constraints rejected, falling back:', e);
+        try {
+          mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: facingMode },
+            audio: false
+          });
+        } catch (e2) {
+          mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+          });
+        }
+      }
 
       setStream(mediaStream);
       if (videoRef.current) {
+        videoRef.current.setAttribute('playsinline', 'true');
+        videoRef.current.setAttribute('webkit-playsinline', 'true');
+        videoRef.current.muted = true;
         videoRef.current.srcObject = mediaStream;
+        try {
+          await videoRef.current.play();
+        } catch (playErr) {
+          console.warn('Video play delayed/interrupted:', playErr);
+        }
       }
     } catch (err) {
       console.warn('Camera open failed:', err);
