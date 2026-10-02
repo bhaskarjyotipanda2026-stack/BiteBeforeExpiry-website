@@ -65,8 +65,8 @@ export function ItemCard({ item, onClick, onMarkUsed, onMarkWasted }) {
             <span className="text-xl">
               {item.type === 'medicine' ? '💊' : '🥛'}
             </span>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 truncate max-w-[120px]">
-              {item.category || item.type}
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 truncate max-w-[140px]">
+              {item.brand ? `${item.brand} • ` : ''}{item.category || item.type}
             </span>
           </div>
 
@@ -120,6 +120,11 @@ export function ItemCard({ item, onClick, onMarkUsed, onMarkWasted }) {
             <div className="flex items-center space-x-1.5 text-[11px] text-slate-400 dark:text-slate-500">
               <span className="shrink-0">🏭</span>
               <span>Mfg: <strong className="font-semibold text-slate-700 dark:text-slate-300">{item.mfgDate}</strong></span>
+            </div>
+          )}
+          {(item.isCalculatedDate || item.calculationNote) && (
+            <div className="text-[10px] text-amber-600 dark:text-amber-400 font-bold">
+              ⚡ Calculated from MFG + Best Before
             </div>
           )}
         </div>

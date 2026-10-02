@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Camera, Upload, Sparkles, AlertCircle, FileText, ArrowRight, 
   HelpCircle, RefreshCw, CheckCircle, Languages, Loader2, Info, ChefHat, Eye,
@@ -15,6 +15,7 @@ import { extractBarcodeCandidatesFromOcr } from '../../services/barcodeScannerSe
 import { CameraCaptureModal } from '../common/CameraCaptureModal';
 import { PantryVisionScannerModal } from '../recipes/PantryVisionScannerModal';
 import { BarcodeScannerModal } from './BarcodeScannerModal';
+import { OcrLabelScannerModal } from './OcrLabelScannerModal';
 
 export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateToRecipes }) {
   const { settings, showToast } = useApp();
@@ -34,6 +35,13 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
   const [isQueryingApi, setIsQueryingApi] = useState(false);
   const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
 
+  // Dedicated OCR Label Scanner state
+  const [isOcrScannerOpen, setIsOcrScannerOpen] = useState(false);
+  const [barcodeIdentifiedItem, setBarcodeIdentifiedItem] = useState(null);
+  const [barcodeNotFound, setBarcodeNotFound] = useState(false);
+  const directUploadInputRef = useRef(null);
+  const [isDirectUploading, setIsDirectUploading] = useState(false);
+
   // Camera modal state
   const [cameraModal, setCameraModal] = useState({ isOpen: false, target: 'front' });
 
@@ -49,6 +57,7 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
     }
 
     setIsQueryingApi(true);
+    setBarcodeNotFound(false);
     showToast(`Querying Product Intelligence API for "${query}"...`, 'info');
 
     try {
@@ -58,33 +67,118 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
       });
 
       if (!intel || (!intel.verifiedName && !intel.expiryInfo?.realExpiryDate)) {
-        showToast('Could not find product in database. Please scan packaging photo or enter manually.', 'warning');
+        setBarcodeNotFound(true);
+        setBarcodeIdentifiedItem(null);
+        showToast('Product information not found in barcode database. You can scan label with OCR or enter manually.', 'warning');
         return;
       }
 
-      showToast(`Detected ${intel.verifiedName}! Expiry, composition & lifespan computed.`, 'success', '✨');
-
-      // Forward to analysis complete
-      onAnalysisComplete({
+      setBarcodeNotFound(false);
+      const identified = {
         name: intel.verifiedName,
+        brand: intel.brand || intel.openFoodFactsData?.brands || '',
+        category: intel.category || (intel.productType === 'medicine' ? 'Tablets & Capsules' : 'Dairy & Milk Products'),
         type: intel.productType,
+        barcode: intel.barcode || query,
         expiryDate: intel.expiryInfo?.realExpiryDate || '',
         mfgDate: intel.expiryInfo?.mfgDate || '',
-        barcode: intel.barcode || null,
+        batchNumber: intel.batchNumber || intel.expiryInfo?.batchNumber || '',
         ingredientsOriginal: intel.openFoodFactsData?.ingredientsList || intel.composition?.primaryRawMaterials?.map(m => m.name) || [],
-        rawOcrText: `Product API Lookup: ${intel.verifiedName}\nBarcode: ${intel.barcode || 'N/A'}\n${intel.composition?.summary || ''}`,
+        nutritionInfo: intel.nutritionInfo || intel.openFoodFactsData?.nutrition || null,
+        productIntelligence: intel,
+        rawOcrText: `Product Barcode Lookup: ${intel.verifiedName}\nBarcode: ${intel.barcode || query}\n${intel.composition?.summary || ''}`,
         frontImage: intel.openFoodFactsData?.productImage || null,
         backImage: null,
-        targetLanguage: selectedLanguage,
-        ingredientsTranslated: {},
-        productIntelligence: intel
-      });
+        sourceOfInfo: 'barcode'
+      };
+
+      setBarcodeIdentifiedItem(identified);
+      showToast(`Detected "${intel.verifiedName}"! Now scan package label with OCR to read printed MFG, Expiry & Batch.`, 'success', '✨');
+
     } catch (err) {
       console.error('API lookup error:', err);
-      showToast('API lookup failed. Please try with package photo.', 'error');
+      setBarcodeNotFound(true);
+      showToast('Product lookup encountered an issue. Please try scanning package label with OCR.', 'warning');
     } finally {
       setIsQueryingApi(false);
     }
+  };
+
+  // Proceed with Barcode data only (skip OCR)
+  const handleProceedWithBarcodeOnly = () => {
+    if (!barcodeIdentifiedItem) return;
+    onAnalysisComplete({
+      ...barcodeIdentifiedItem,
+      sourceOfInfo: 'barcode',
+      targetLanguage: selectedLanguage,
+      ingredientsTranslated: {}
+    });
+  };
+
+  // Handle OCR parsed label (from camera modal or upload)
+  const handleLabelParsed = (ocrResult) => {
+    setIsOcrScannerOpen(false);
+
+    // Combine Barcode + OCR Information
+    const combined = {
+      name: barcodeIdentifiedItem?.name || ocrResult.name || 'Scanned Product',
+      brand: barcodeIdentifiedItem?.brand || ocrResult.brand || '',
+      category: barcodeIdentifiedItem?.category || (ocrResult.type === 'medicine' ? 'Tablets & Capsules' : 'Dairy & Milk Products'),
+      type: barcodeIdentifiedItem?.type || ocrResult.type || 'grocery',
+      barcode: barcodeIdentifiedItem?.barcode || null,
+      mfgDate: ocrResult.mfgDate || barcodeIdentifiedItem?.mfgDate || '',
+      expiryDate: ocrResult.expiryDate || barcodeIdentifiedItem?.expiryDate || '',
+      isCalculatedDate: ocrResult.isCalculatedDate || false,
+      calculationNote: ocrResult.calculationNote || null,
+      bestBeforePeriod: ocrResult.bestBeforePeriod || null,
+      batchNumber: ocrResult.batchNumber || barcodeIdentifiedItem?.batchNumber || null,
+      ingredientsOriginal: (ocrResult.ingredientsOriginal && ocrResult.ingredientsOriginal.length > 0)
+        ? ocrResult.ingredientsOriginal
+        : (barcodeIdentifiedItem?.ingredientsOriginal || []),
+      nutritionInfo: ocrResult.nutritionInfo || barcodeIdentifiedItem?.nutritionInfo || null,
+      sourceOfInfo: barcodeIdentifiedItem ? 'barcode+ocr' : 'ocr',
+      frontImage: ocrResult.labelImage || barcodeIdentifiedItem?.frontImage || frontImage || null,
+      backImage: null,
+      rawOcrText: `${barcodeIdentifiedItem ? `Barcode: ${barcodeIdentifiedItem.barcode}\n` : ''}${ocrResult.rawOcrText || ''}`,
+      targetLanguage: selectedLanguage,
+      ingredientsTranslated: {},
+      productIntelligence: barcodeIdentifiedItem?.productIntelligence || null,
+      confidence: ocrResult.confidence || 'high',
+      requiresVerification: ocrResult.requiresVerification || false,
+      verificationReason: ocrResult.verificationReason || ''
+    };
+
+    onAnalysisComplete(combined);
+  };
+
+  // Direct label file upload handler
+  const handleDirectLabelUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsDirectUploading(true);
+    showToast('Reading package label with OCR...', 'info');
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result;
+      try {
+        const googleKey = settings.apiKeys?.googleVisionApiKey;
+        const ocrRes = await performOcr(dataUrl, { googleVisionApiKey: googleKey });
+        const parsed = parsePackageData('', ocrRes.text);
+        handleLabelParsed({
+          ...parsed,
+          labelImage: dataUrl,
+          rawOcrText: ocrRes.text
+        });
+      } catch (err) {
+        console.error('Direct label upload OCR error:', err);
+        showToast('Could not read label from image. Try another photo or enter manually.', 'error');
+      } finally {
+        setIsDirectUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   // Handle file input upload
@@ -274,6 +368,191 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
         <p className="mt-2 text-sm sm:text-base text-slate-600 dark:text-slate-400">
           Capture package labels or scan barcodes to detect verified real expiry dates, discover what products are made up of, and track their true lifespan & shelf life.
         </p>
+      </div>
+
+      {/* ==================================================
+          PRIMARY SCANNING SCREEN (Preferred Layout):
+          SCAN PRODUCT
+          [ Scan Barcode ] OR [ Scan Label with OCR ] OR [ Upload Label Image ]
+          ================================================== */}
+      <div className="mb-8 p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-emerald-500/30 dark:border-emerald-500/20 shadow-xl shadow-slate-100 dark:shadow-none">
+        <div className="text-center max-w-lg mx-auto mb-6">
+          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-black uppercase tracking-wider mb-2">
+            <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>Barcode + OCR Scanning Engine</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            SCAN PRODUCT
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <strong>Barcode</strong> identifies the product • <strong>OCR</strong> reads package-specific dates & batch
+          </p>
+        </div>
+
+        {/* The 3 Core Scanning Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          {/* Action 1: Scan Barcode */}
+          <button
+            id="btn-scan-barcode"
+            onClick={() => setIsBarcodeScannerOpen(true)}
+            className="group relative p-6 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white shadow-lg shadow-emerald-700/20 text-left transition-all transform hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
+          >
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                <BarcodeIcon className="w-6 h-6" />
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-200 block">Step 1: Product ID</span>
+                <h3 className="text-lg font-black text-white mt-0.5">Scan Barcode</h3>
+                <p className="text-xs text-emerald-100/90 mt-1 leading-relaxed">
+                  Identifies product name, brand & category from Open Food Facts & FDA Database
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 pt-3 border-t border-white/15 flex items-center justify-between text-xs font-bold text-white">
+              <span>Launch Barcode Camera</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </button>
+
+          {/* Action 2: Scan Label with OCR */}
+          <button
+            id="btn-scan-ocr-label"
+            onClick={() => setIsOcrScannerOpen(true)}
+            className="group relative p-6 rounded-2xl bg-gradient-to-br from-indigo-600 via-teal-700 to-emerald-700 hover:from-indigo-700 hover:to-emerald-800 text-white shadow-lg shadow-indigo-700/20 text-left transition-all transform hover:-translate-y-1 flex flex-col justify-between overflow-hidden"
+          >
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                <Camera className="w-6 h-6" />
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-200 block">Step 2: Package Dates</span>
+                <h3 className="text-lg font-black text-white mt-0.5">Scan Label with OCR</h3>
+                <p className="text-xs text-indigo-100/90 mt-1 leading-relaxed">
+                  Extracts printed MFG Date, EXP / Best Before, Batch/Lot & Ingredients
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 pt-3 border-t border-white/15 flex items-center justify-between text-xs font-bold text-white">
+              <span>Open Label OCR Camera</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </button>
+
+          {/* Action 3: Upload Label Image */}
+          <button
+            id="btn-upload-label-image"
+            onClick={() => directUploadInputRef.current?.click()}
+            disabled={isDirectUploading}
+            className="group relative p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-800 dark:text-white border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 text-left transition-all transform hover:-translate-y-1 flex flex-col justify-between"
+          >
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center group-hover:scale-110 transition-transform">
+                {isDirectUploading ? <Loader2 className="w-6 h-6 animate-spin text-emerald-600" /> : <Upload className="w-6 h-6 text-slate-600 dark:text-slate-300" />}
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Direct File</span>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white mt-0.5">Upload Label Image</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                  Select package photo from device gallery or storage for instant OCR extraction
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+              <span>{isDirectUploading ? 'Processing OCR...' : 'Choose Image File'}</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </button>
+
+        </div>
+
+        {/* PRODUCT IDENTIFIED BY BARCODE BANNER (If barcode was scanned first) */}
+        {barcodeIdentifiedItem && (
+          <div className="mt-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/30 border border-emerald-300 dark:border-emerald-800 animate-slide-up">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start space-x-3.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xl shrink-0 mt-0.5">
+                  🏷️
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-600 text-white">
+                      Product Identified by Barcode
+                    </span>
+                    <span className="text-xs text-slate-500 font-mono">
+                      {barcodeIdentifiedItem.barcode}
+                    </span>
+                  </div>
+                  <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5">
+                    {barcodeIdentifiedItem.name} {barcodeIdentifiedItem.brand ? `• ${barcodeIdentifiedItem.brand}` : ''}
+                  </h4>
+                  <p className="text-xs text-emerald-800 dark:text-emerald-300 mt-0.5">
+                    Barcode provides product & brand. Now scan the printed package label with OCR to detect exact package dates (MFG & Expiry) and Batch number!
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                  id="btn-banner-scan-ocr"
+                  onClick={() => setIsOcrScannerOpen(true)}
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md flex items-center space-x-1.5 transition-all"
+                >
+                  <Camera className="w-4 h-4" />
+                  <span>Scan Label with OCR</span>
+                </button>
+                <button
+                  onClick={handleProceedWithBarcodeOnly}
+                  className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-300 dark:border-slate-700 transition-all"
+                >
+                  <span>Skip to Information</span>
+                </button>
+                <button
+                  onClick={() => setBarcodeIdentifiedItem(null)}
+                  className="p-2.5 rounded-xl text-slate-400 hover:text-rose-600 transition-colors"
+                  title="Clear barcode"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* BARCODE NOT FOUND IN DATABASE BANNER */}
+        {barcodeNotFound && (
+          <div className="mt-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-slide-up">
+            <div className="flex items-center space-x-3">
+              <AlertCircle className="w-6 h-6 text-amber-600 shrink-0" />
+              <div>
+                <h4 className="text-sm font-extrabold text-amber-900 dark:text-amber-200">
+                  Product information not found in barcode database
+                </h4>
+                <p className="text-xs text-amber-800 dark:text-amber-300 mt-0.5">
+                  The barcode is not yet registered. You can easily capture the product name and dates by scanning the package label with OCR or entering manually.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 shrink-0">
+              <button
+                onClick={() => setIsOcrScannerOpen(true)}
+                className="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs shadow-sm transition-all flex items-center space-x-1"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>Scan Label with OCR</span>
+              </button>
+              <button
+                onClick={() => onOpenUndatedModal({})}
+                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-300 dark:border-slate-700 transition-all"
+              >
+                <span>Enter Manually</span>
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* HERO: Live Barcode & Real Dataset Scanner Card */}
@@ -707,6 +986,23 @@ export function ScanScreen({ onAnalysisComplete, onOpenUndatedModal, onNavigateT
           setBarcodeInput(code);
           handleBarcodeOrApiLookup(code);
         }}
+      />
+
+      {/* Dedicated OCR Label Scanner Modal */}
+      <OcrLabelScannerModal
+        isOpen={isOcrScannerOpen}
+        onClose={() => setIsOcrScannerOpen(false)}
+        initialBarcodeData={barcodeIdentifiedItem}
+        onLabelParsed={handleLabelParsed}
+      />
+
+      {/* Hidden file input for direct label image upload */}
+      <input
+        ref={directUploadInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleDirectLabelUpload}
       />
 
     </div>

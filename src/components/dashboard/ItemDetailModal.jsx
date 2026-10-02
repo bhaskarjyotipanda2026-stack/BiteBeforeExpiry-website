@@ -2,13 +2,15 @@ import React, { useState, useMemo } from 'react';
 import { 
   X, CheckCircle2, Trash2, Calendar, Clock, Sparkles, Tag, 
   AlertTriangle, ShieldCheck, Edit3, Save, ChevronRight, FileText, ChefHat,
-  HeartPulse, Activity, Check, ShieldAlert, Bell, BellRing, Volume2
+  HeartPulse, Activity, Check, ShieldAlert, Bell, BellRing, Volume2, Recycle, XCircle, Info
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { calculateHealthScore } from '../../services/healthScoreService';
 import { analyzeProductComposition, analyzeProductLifespan } from '../../services/productIntelligenceService';
 import { ALARM_SOUND_TYPES, WARNING_SIGN_OPTIONS, previewAlarmSound } from '../../services/alarmSoundService';
 import { ProductIntelligenceCard } from '../common/ProductIntelligenceCard';
+import { AIProductIntelligenceCard } from '../common/AIProductIntelligenceCard';
+import { predictSmartAttention } from '../../ml/mlPipeline';
 import { IngredientModal } from '../scan/IngredientModal';
 
 export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) {
@@ -19,6 +21,12 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
   const [editName, setEditName] = useState('');
   const [editExpiryDate, setEditExpiryDate] = useState('');
   const [editNotes, setEditNotes] = useState('');
+
+  // Post-Expiry & Waste Tracking Outcome State
+  const [showOutcomeDialog, setShowOutcomeDialog] = useState(false);
+  const [outcomeAction, setOutcomeAction] = useState('wasted'); // 'wasted' | 'discarded'
+  const [outcomeReason, setOutcomeReason] = useState('expired'); // 'expired' | 'spoiled' | 'unused' | 'damaged' | 'other'
+  const [outcomeQuantity, setOutcomeQuantity] = useState(1);
 
   // Calculate health score
   const healthScore = useMemo(() => {
@@ -80,10 +88,38 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
     };
   }, [item]);
 
+  // Compute ML Smart Attention & Waste Risk for ItemDetailModal
+  const mlPrediction = useMemo(() => {
+    if (!item) return null;
+    return predictSmartAttention(item, {
+      userAllergies: settings.userAllergies || []
+    });
+  }, [item, settings.userAllergies]);
+
   if (!isOpen || !item) return null;
 
   const urgency = getItemUrgency(item);
   const days = urgency.daysRemaining;
+  const isExpired = urgency.color === 'red' || (days !== null && days <= 0);
+  const isMedicine = item.type === 'medicine';
+
+  const handleOpenOutcome = (action = 'wasted') => {
+    setOutcomeAction(action);
+    setOutcomeReason(isExpired ? 'expired' : 'spoiled');
+    setOutcomeQuantity(1);
+    setShowOutcomeDialog(true);
+  };
+
+  const handleConfirmOutcome = () => {
+    const qty = Math.max(1, parseInt(outcomeQuantity, 10) || 1);
+    if (outcomeAction === 'wasted') {
+      markAsWasted(item.id, { quantity: qty, reason: outcomeReason });
+    } else {
+      markAsDiscarded(item.id, { quantity: qty, reason: outcomeReason });
+    }
+    setShowOutcomeDialog(false);
+    onClose();
+  };
 
   const handleStartEdit = () => {
     setEditName(item.name);
@@ -106,7 +142,7 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
       <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 my-6">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 bg-slate-50 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-between p-4 sm:p-6 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center space-x-3">
             <span className="text-2xl">
               {item.type === 'medicine' ? '💊' : '🥛'}
@@ -175,6 +211,29 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
             </div>
           </div>
 
+          {/* Post-Expiry Warnings (Strictly Separated for Food & Medicine) */}
+          {isExpired && (
+            <div className={`p-4 rounded-2xl border flex items-start space-x-3 ${
+              isMedicine
+                ? 'bg-rose-100/90 dark:bg-rose-950/80 border-rose-400 dark:border-rose-700 text-rose-950 dark:text-rose-100 ring-2 ring-rose-500/20'
+                : 'bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-rose-950 dark:text-rose-200'
+            }`}>
+              <ShieldAlert className={`w-6 h-6 shrink-0 mt-0.5 ${isMedicine ? 'text-rose-700 dark:text-rose-400 animate-pulse' : 'text-rose-600 dark:text-rose-400'}`} />
+              <div className="text-xs space-y-1">
+                <span className="font-black text-sm block">
+                  {isMedicine
+                    ? 'CRITICAL SAFETY ALERT: NEVER CONSUME EXPIRED MEDICINE'
+                    : 'SAFETY WARNING: EXPIRED FOOD PRODUCT'}
+                </span>
+                <p className="leading-relaxed opacity-95">
+                  {isMedicine
+                    ? 'Active pharmaceutical ingredients break down chemically after the expiration date. Ingestion risks severe toxicity, organ stress, or ineffective treatment. Do NOT consume. Follow safe disposal guidance below.'
+                    : 'This product has passed its verified package expiration date. In accordance with food safety standards, it has been removed from active-use recipe recommendations. Please record outcome or dispose responsibly.'}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Dual Date Showcase: Manufacturing & Expiry Dates */}
           <div className="grid grid-cols-2 gap-2.5">
             <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
@@ -193,8 +252,56 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
               <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
                 {item.expiryDate || 'Calculated Valid'}
               </span>
+              {(item.isCalculatedDate || item.calculationNote) && (
+                <span className="block mt-1 text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                  ⚡ Calculated from MFG + Best Before
+                </span>
+              )}
             </div>
           </div>
+
+          {/* Brand & Batch Number Showcase */}
+          {(item.brand || item.batchNumber) && (
+            <div className="grid grid-cols-2 gap-2.5">
+              {item.brand && (
+                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
+                    🏷️ Brand
+                  </span>
+                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate block">
+                    {item.brand}
+                  </span>
+                </div>
+              )}
+              {item.batchNumber && (
+                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
+                    🔢 Batch / Lot
+                  </span>
+                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate block font-mono">
+                    {item.batchNumber}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Nutrition Information (when available) */}
+          {item.nutritionInfo && Object.keys(item.nutritionInfo).length > 0 && (
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-2">
+              <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block">
+                🥗 Nutrition Information
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                {Object.entries(item.nutritionInfo).map(([key, val]) => (
+                  <div key={key} className="p-2 rounded-xl bg-white dark:bg-slate-750 border border-slate-200 dark:border-slate-700">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block capitalize">{key}</span>
+                    <span className="font-extrabold text-slate-800 dark:text-white">{String(val)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* HEALTH & NUTRITION SCORE CARD */}
           {healthScore && (
@@ -295,6 +402,14 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
               </div>
             </div>
           ) : null}
+
+          {/* AI PRODUCT INTELLIGENCE & ML ATTENTION ENGINE (PART 2) */}
+          {(item.productIntelligence || productIntelligence || mlPrediction) && (
+            <AIProductIntelligenceCard 
+              aiData={item.productIntelligence || productIntelligence} 
+              mlPrediction={mlPrediction} 
+            />
+          )}
 
           {/* PRODUCT INTELLIGENCE (REAL EXPIRY, COMPOSITION & LIFESPAN) */}
           {productIntelligence && (
@@ -468,30 +583,65 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
           )}
 
           {/* Contextual Zero-Waste Action Callout: Cook Recipes or Safe Disposal Protocol */}
-          {onNavigateToRecipes && (
-            <div className={`p-4 rounded-2xl border text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
-              item.type === 'medicine' || urgency.color === 'red'
-                ? 'bg-rose-50/70 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/60 text-rose-950 dark:text-rose-200'
-                : 'bg-amber-50/70 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/60 text-amber-950 dark:text-amber-200'
-            }`}>
+          {isMedicine ? (
+            <div className="p-4 rounded-2xl border text-xs bg-rose-50/80 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/60 text-rose-950 dark:text-rose-200 space-y-2">
+              <div className="flex items-center space-x-2.5 font-extrabold text-sm">
+                <span className="p-1.5 rounded-xl bg-white dark:bg-slate-800 text-base">💊</span>
+                <span>Safe Medicine Disposal Protocol (FDA / DEA Compliant)</span>
+              </div>
+              <ul className="text-[11px] space-y-1 list-disc list-inside opacity-90 pl-1">
+                <li><strong>Never flush</strong> down sinks or toilets unless explicitly instructed on packaging.</li>
+                <li><strong>Mix capsules or liquid</strong> with an unpalatable substance (coffee grounds, dirt, or cat litter).</li>
+                <li><strong>Seal in a bag</strong> or leak-proof container before placing in household trash.</li>
+                <li><strong>Scratch out personal info</strong> on label to protect privacy.</li>
+                <li>Prefer authorized <strong>pharmacy drop-boxes</strong> or community drug take-back days.</li>
+              </ul>
+              <div className="pt-2 flex justify-end">
+                <button
+                  onClick={() => handleOpenOutcome('discarded')}
+                  className="px-4 py-2 rounded-xl text-xs font-extrabold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-all flex items-center space-x-1.5"
+                >
+                  <Recycle className="w-4 h-4" />
+                  <span>Record Medicine Disposal / Removal</span>
+                </button>
+              </div>
+            </div>
+          ) : isExpired ? (
+            <div className="p-4 rounded-2xl border text-xs bg-amber-50/80 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/60 text-amber-950 dark:text-amber-200 space-y-2">
+              <div className="flex items-center space-x-2.5 font-extrabold text-sm">
+                <span className="p-1.5 rounded-xl bg-white dark:bg-slate-800 text-base">♻️</span>
+                <span>Expired Food Handling & Composting Advice</span>
+              </div>
+              <p className="text-[11px] leading-relaxed opacity-90">
+                Removed from active-use cooking recipes to eliminate food poisoning risks. Separate outer packaging for recycling. Vegetable scraps and peelings can be safely composted; dispose spoiled meat or dairy in sealed waste bags.
+              </p>
+              <div className="pt-2 flex justify-end space-x-2">
+                <button
+                  onClick={() => handleOpenOutcome('discarded')}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 hover:bg-amber-300 transition-colors"
+                >
+                  Record Discarded
+                </button>
+                <button
+                  onClick={() => handleOpenOutcome('wasted')}
+                  className="px-4 py-1.5 rounded-xl text-xs font-extrabold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-all"
+                >
+                  Record Wasted
+                </button>
+              </div>
+            </div>
+          ) : onNavigateToRecipes ? (
+            <div className="p-4 rounded-2xl border text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/60 text-emerald-950 dark:text-emerald-200">
               <div className="flex items-center space-x-3">
                 <span className="p-2 rounded-xl bg-white dark:bg-slate-800 shadow-2xs text-lg shrink-0">
-                  {item.type === 'medicine' ? '💊' : urgency.color === 'red' ? '⚠️' : '👨‍🍳'}
+                  👨‍🍳
                 </span>
                 <div>
                   <span className="font-extrabold text-xs block">
-                    {item.type === 'medicine'
-                      ? 'Expired Medicine Safe Disposal Protocol'
-                      : urgency.color === 'red'
-                      ? 'Post-Expiry Safe Action & Food Repurposing'
-                      : 'Cook Zero-Waste Recipe With This Ingredient'}
+                    Cook Zero-Waste Recipe With This Item
                   </span>
                   <p className="text-[11px] opacity-80 mt-0.5 leading-relaxed">
-                    {item.type === 'medicine'
-                      ? 'Never flush down sinks! Follow the sealed coffee-grounds trash method or pharmacy drop-box.'
-                      : urgency.color === 'red'
-                      ? 'Check if this item can be converted into cheese/fertilizer, or if it violates health safety red lines.'
-                      : 'Calculate protein, carbs, healthy fats, and step-by-step 15-minute quick prep.'}
+                    Personalized AI pantry recipes sorted by urgency. Ready in 15 minutes.
                   </p>
                 </div>
               </div>
@@ -501,18 +651,12 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
                   onClose();
                   onNavigateToRecipes();
                 }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-extrabold shadow-sm transition-all whitespace-nowrap self-stretch sm:self-auto text-center shrink-0 ${
-                  item.type === 'medicine' || urgency.color === 'red'
-                    ? 'bg-rose-600 hover:bg-rose-700 text-white'
-                    : 'bg-amber-600 hover:bg-amber-700 text-white'
-                }`}
+                className="px-3.5 py-2 rounded-xl text-xs font-extrabold shadow-sm transition-all whitespace-nowrap self-stretch sm:self-auto text-center shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white"
               >
-                {item.type === 'medicine' || urgency.color === 'red'
-                  ? 'View Disposal Guide →'
-                  : 'View Instant Recipes →'}
+                View Instant Recipes →
               </button>
             </div>
-          )}
+          ) : null}
 
           {/* Tracking Timestamps */}
           <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800">
@@ -523,7 +667,7 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
         </div>
 
         {/* Action Controls Footer */}
-        <div className="p-4 sm:p-5 bg-slate-50 dark:bg-slate-850 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
+        <div className="p-4 sm:p-5 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
           
           <div className="flex items-center space-x-2">
             {!isEditing && (
@@ -549,31 +693,207 @@ export function ItemDetailModal({ isOpen, onClose, item, onNavigateToRecipes }) 
           </div>
 
           <div className="flex items-center space-x-2">
-            <button
-              onClick={() => {
-                markAsWasted(item.id);
-                onClose();
-              }}
-              className="px-3.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-950/60 text-slate-700 dark:text-slate-300 hover:text-rose-700 text-xs font-bold transition-colors"
-            >
-              Mark Wasted
-            </button>
+            {isExpired ? (
+              <>
+                <button
+                  onClick={() => handleOpenOutcome('discarded')}
+                  className="px-3.5 py-2 rounded-xl bg-amber-100 dark:bg-amber-950/80 hover:bg-amber-200 dark:hover:bg-amber-900 text-amber-900 dark:text-amber-200 text-xs font-bold transition-colors flex items-center space-x-1"
+                >
+                  <Recycle className="w-3.5 h-3.5" />
+                  <span>Record Discarded</span>
+                </button>
+                <button
+                  onClick={() => handleOpenOutcome('wasted')}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold shadow-sm transition-all flex items-center space-x-1"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Record Wasted</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => handleOpenOutcome('wasted')}
+                  className="px-3.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-950/60 text-slate-700 dark:text-slate-300 hover:text-rose-700 text-xs font-bold transition-colors"
+                >
+                  Mark Wasted
+                </button>
 
-            <button
-              onClick={() => {
-                markAsUsed(item.id);
-                onClose();
-              }}
-              className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-sm transition-all"
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Mark as Used</span>
-            </button>
+                <button
+                  onClick={() => {
+                    markAsUsed(item.id, { quantity: 1, reason: 'Consumed safely before expiry' });
+                    onClose();
+                  }}
+                  className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-sm transition-all"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Mark as Used</span>
+                </button>
+              </>
+            )}
           </div>
 
         </div>
 
       </div>
+
+      {/* Post-Expiry Outcome Recording Modal */}
+      {showOutcomeDialog && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+              <div className="flex items-center space-x-2.5">
+                <div className={`p-2 rounded-xl text-white ${outcomeAction === 'wasted' ? 'bg-rose-600' : 'bg-amber-600'}`}>
+                  {outcomeAction === 'wasted' ? <Trash2 className="w-5 h-5" /> : <Recycle className="w-5 h-5" />}
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                    Record {outcomeAction === 'wasted' ? 'Waste' : 'Disposal'} Outcome
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
+                    {item.name} • {item.category}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowOutcomeDialog(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Action Type Toggle */}
+            <div>
+              <label className="block text-xs font-extrabold uppercase text-slate-500 dark:text-slate-400 mb-1.5">
+                Outcome Status
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setOutcomeAction('wasted')}
+                  className={`p-2.5 rounded-xl border text-xs font-bold transition-all text-center ${
+                    outcomeAction === 'wasted'
+                      ? 'bg-rose-500 text-white border-rose-500 shadow-sm'
+                      : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-rose-400'
+                  }`}
+                >
+                  🗑️ Marked as Wasted
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOutcomeAction('discarded')}
+                  className={`p-2.5 rounded-xl border text-xs font-bold transition-all text-center ${
+                    outcomeAction === 'discarded'
+                      ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
+                      : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-amber-400'
+                  }`}
+                >
+                  ♻️ Safely Discarded / Removed
+                </button>
+              </div>
+            </div>
+
+            {/* Quantity Selector */}
+            <div>
+              <label className="block text-xs font-extrabold uppercase text-slate-500 dark:text-slate-400 mb-1.5">
+                Quantity ({item.type === 'medicine' ? 'Packs/Units' : 'Units/Items'})
+              </label>
+              <div className="flex items-center space-x-2">
+                {[1, 2, 3, 5].map(q => (
+                  <button
+                    key={q}
+                    type="button"
+                    onClick={() => setOutcomeQuantity(q)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
+                      outcomeQuantity === q
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-400'
+                    }`}
+                  >
+                    {q}
+                  </button>
+                ))}
+                <div className="flex items-center space-x-1.5 ml-2">
+                  <span className="text-xs text-slate-400">Qty:</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={outcomeQuantity}
+                    onChange={(e) => setOutcomeQuantity(e.target.value)}
+                    className="w-16 px-2 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg text-xs font-bold text-center"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Standard Reason Selector */}
+            <div>
+              <label className="block text-xs font-extrabold uppercase text-slate-500 dark:text-slate-400 mb-1.5">
+                Recorded Reason
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                {[
+                  { id: 'expired', label: 'Expired Date', icon: '⏳' },
+                  { id: 'spoiled', label: 'Spoiled / Mold', icon: '🦠' },
+                  { id: 'unused', label: 'Unused / Leftover', icon: '📦' },
+                  { id: 'damaged', label: 'Damaged Pack', icon: '💥' },
+                  { id: 'other', label: 'Other Reason', icon: '📝' }
+                ].map(r => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setOutcomeReason(r.id)}
+                    className={`p-2 rounded-xl border text-left flex items-center space-x-1.5 transition-all ${
+                      outcomeReason === r.id
+                        ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-900 dark:text-emerald-300 border-emerald-500 ring-1 ring-emerald-500/30 font-bold'
+                        : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-400'
+                    }`}
+                  >
+                    <span>{r.icon}</span>
+                    <span className="truncate">{r.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Disposal Guidance Box */}
+            <div className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-300 space-y-1">
+              <span className="font-extrabold text-slate-900 dark:text-white flex items-center space-x-1">
+                <Info className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                <span>
+                  {isMedicine ? 'Safe Medicine Disposal Protocol' : 'Safe Disposal & Composting'}
+                </span>
+              </span>
+              <p className="leading-relaxed opacity-90">
+                {isMedicine
+                  ? 'Mix with coffee grounds/cat litter in sealed bag. Do not flush down water drains. Scratch out personal prescription labels.'
+                  : 'Separate packaging for recycling. Compost raw produce scraps; safely bag dairy/meat to prevent bacterial contamination.'}
+              </p>
+            </div>
+
+            {/* Confirm Actions */}
+            <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowOutcomeDialog(false)}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmOutcome}
+                className="px-5 py-2 rounded-xl bg-slate-900 dark:bg-emerald-600 hover:bg-slate-800 dark:hover:bg-emerald-700 text-white text-xs font-extrabold shadow-md transition-all flex items-center space-x-1.5"
+              >
+                <Check className="w-4 h-4" />
+                <span>Save to Waste History</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Selected Ingredient Explanation Modal */}
       <IngredientModal

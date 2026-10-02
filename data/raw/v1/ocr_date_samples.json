@@ -1,0 +1,72 @@
+[
+  {
+    "raw_text": "MFG 28/08/2026 EXP 28/10/2026 BATCH B-402",
+    "expected_expiry": "2026-10-28",
+    "expected_mfg": "2026-08-28",
+    "is_valid": true,
+    "category": "Dairy & Milk Products"
+  },
+  {
+    "raw_text": "B.No. AM9021\nMFG: 10-09-2026\nEXP: 20-09-2026\nM.R.P. Rs. 45.00",
+    "expected_expiry": "2026-09-20",
+    "expected_mfg": "2026-09-10",
+    "is_valid": true,
+    "category": "Bakery & Bread"
+  },
+  {
+    "raw_text": "USE BY 15 NOV 2026 / PACKED 15 MAY 2026",
+    "expected_expiry": "2026-11-15",
+    "expected_mfg": "2026-05-15",
+    "is_valid": true,
+    "category": "Dairy & Milk Products"
+  },
+  {
+    "raw_text": "EXPIRY: 10/o9/2026 (Optical OCR typo letter o instead of zero)",
+    "expected_expiry": "2026-09-10",
+    "expected_mfg": null,
+    "is_valid": true,
+    "category": "Snacks & Confectionery"
+  },
+  {
+    "raw_text": "BEST BEFORE 12 MONTHS FROM PACKAGING / PKG: 01/01/2026",
+    "expected_expiry": "2027-01-01",
+    "expected_mfg": "2026-01-01",
+    "is_valid": true,
+    "category": "Condiments & Sauces"
+  },
+  {
+    "raw_text": "EXP 05/2028 BATCH K-9912",
+    "expected_expiry": "2028-05-31",
+    "expected_mfg": null,
+    "is_valid": true,
+    "category": "Tablets & Capsules"
+  },
+  {
+    "raw_text": "MFG DATE: 2026-12-01\nEXP DATE: 2026-06-01 (Error: Expiry prior to MFG!)",
+    "expected_expiry": "2026-06-01",
+    "expected_mfg": "2026-12-01",
+    "is_valid": false,
+    "category": "Tablets & Capsules"
+  },
+  {
+    "raw_text": "LOT: 88471 NO PRINTED EXPIRY DATE ON FRONT PANEL",
+    "expected_expiry": null,
+    "expected_mfg": null,
+    "is_valid": false,
+    "category": "Snacks & Confectionery"
+  },
+  {
+    "raw_text": "VAL: 31-DEC-2029 / LOT: PH-2201",
+    "expected_expiry": "2029-12-31",
+    "expected_mfg": null,
+    "is_valid": true,
+    "category": "Antibiotics & Prescriptions"
+  },
+  {
+    "raw_text": "BBD 24.12.26 / NET WT 500g",
+    "expected_expiry": "2026-12-24",
+    "expected_mfg": null,
+    "is_valid": true,
+    "category": "Dairy & Milk Products"
+  }
+]

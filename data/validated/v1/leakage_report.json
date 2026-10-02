@@ -1,0 +1,18 @@
+{
+  "status": "PASSED_ZERO_LEAKAGE",
+  "total_records": 60,
+  "train_count": 41,
+  "val_count": 7,
+  "test_count": 12,
+  "splits_ratio": "68.3% / 11.7% / 20.0%",
+  "class_distribution_train": {
+    "food": 17,
+    "medicine": 17,
+    "other": 7
+  },
+  "class_distribution_test": {
+    "food": 5,
+    "medicine": 5,
+    "other": 2
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "model_version": "bitebeforeexpiry-classifier-v1",
+  "evaluation_timestamp": "2026-10-01T17:02:35.950212+00:00",
+  "test_samples": 12,
+  "overall_accuracy": 0.8333,
+  "macro_metrics": {
+    "macro_precision": 0.8333,
+    "macro_recall": 0.8667,
+    "macro_f1": 0.8056
+  },
+  "per_class_metrics": {
+    "food": {
+      "support": 5,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0
+    },
+    "medicine": {
+      "support": 5,
+      "precision": 1.0,
+      "recall": 0.6,
+      "f1_score": 0.75
+    },
+    "other": {
+      "support": 2,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1_score": 0.6667
+    }
+  },
+  "confusion_matrix": {
+    "food": {
+      "food": 5,
+      "medicine": 0,
+      "other": 0
+    },
+    "medicine": {
+      "food": 0,
+      "medicine": 3,
+      "other": 2
+    },
+    "other": {
+      "food": 0,
+      "medicine": 0,
+      "other": 2
+    }
+  },
+  "error_analysis": {
+    "total_errors": 2,
+    "error_rate": 0.1667,
+    "misclassified_samples": [
+      {
+        "id": "med_010",
+        "name": "Ciplox Eye Drops 0.3% Sterile Solution",
+        "actual": "medicine",
+        "predicted": "other",
+        "confidence": 0.79,
+        "feature_text": "Ciplox Eye Drops 0.3% Sterile Solution Cipla ciprofloxacin hydrochloride 0.3% w/v benzalkonium chloride 0.01% w/v (preservative) sterile aqueous vehicle q.s. Eye & Ear Drops"
+      },
+      {
+        "id": "med_016",
+        "name": "Volini Pain Relief Gel Diclofenac Max 30g",
+        "actual": "medicine",
+        "predicted": "other",
+        "confidence": 0.8637,
+        "feature_text": "Volini Pain Relief Gel Diclofenac Max 30g Sun Pharma diclofenac diethylamine 1.16% w/w linseed oil 3.0% w/w methyl salicylate 10.0% w/w menthol 5.0% w/w gel base q.s. Topical & Ointments"
+      }
+    ]
+  }
+}

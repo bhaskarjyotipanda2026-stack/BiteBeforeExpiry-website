@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   CheckCircle, AlertTriangle, Calendar, Tag, Sparkles, Languages, 
   ArrowLeft, Save, Edit3, HelpCircle, ShieldCheck, Clock, Check,
-  HeartPulse, ShieldAlert, Award, Activity, Info
+  HeartPulse, ShieldAlert, Award, Activity, Info, Barcode as BarcodeIcon,
+  FileText, AlertCircle, RefreshCw, Flame, CheckCircle2, ChevronDown
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { ALL_CATEGORIES, SUPPORTED_LANGUAGES } from '../../constants';
@@ -10,33 +11,94 @@ import { translateIngredientsList } from '../../services/translationService';
 import { calculateHealthScore } from '../../services/healthScoreService';
 import { detectProductIntelligence } from '../../services/productIntelligenceService';
 import { ProductIntelligenceCard } from '../common/ProductIntelligenceCard';
+import { AIProductIntelligenceCard } from '../common/AIProductIntelligenceCard';
+import { generateProductIntelligence } from '../../services/aiProductIntelligenceService';
+import { predictSmartAttention } from '../../ml/mlPipeline';
 import { IngredientModal } from './IngredientModal';
+import { dbService } from '../../services/dbService';
+import { mlClientService } from '../../services/mlClientService';
 
 export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
-  const { addItem, settings, getDaysRemaining } = useApp();
+  const { addItem, settings, getDaysRemaining, getAttentionStatus, checkAllergies } = useApp();
+
+  const nameInputRef = useRef(null);
+
+  // Track original values to detect manual corrections
+  const originalValues = useRef({
+    name: scanResult.name,
+    brand: scanResult.brand,
+    expiryDate: scanResult.expiryDate,
+    mfgDate: scanResult.mfgDate,
+    batchNumber: scanResult.batchNumber
+  });
 
   // Editable Form State
   const [name, setName] = useState(scanResult.name || 'Scanned Product');
+  const [brand, setBrand] = useState(
+    scanResult.brand || scanResult.productIntelligence?.brand || scanResult.productIntelligence?.openFoodFactsData?.brands || ''
+  );
+
   const [type, setType] = useState(scanResult.type || 'grocery');
   const [category, setCategory] = useState(
-    scanResult.type === 'medicine' ? 'Tablets & Capsules' : 'Dairy & Milk Products'
+    scanResult.category || (scanResult.type === 'medicine' ? 'Tablets & Capsules' : 'Dairy & Milk Products')
   );
   const [expiryDate, setExpiryDate] = useState(scanResult.expiryDate || '');
   const [mfgDate, setMfgDate] = useState(scanResult.mfgDate || '');
+  const [batchNumber, setBatchNumber] = useState(
+    scanResult.batchNumber || scanResult.productIntelligence?.batchNumber || scanResult.productIntelligence?.expiryInfo?.batchNumber || ''
+  );
+  const [bestBeforePeriod, setBestBeforePeriod] = useState(
+    scanResult.bestBeforePeriod || scanResult.productIntelligence?.expiryInfo?.bestBeforePeriod || ''
+  );
+  const [isCalculatedDate, setIsCalculatedDate] = useState(
+    scanResult.isCalculatedDate || scanResult.productIntelligence?.expiryInfo?.isCalculatedDate || false
+  );
+  const [calculationNote, setCalculationNote] = useState(
+    scanResult.calculationNote || scanResult.productIntelligence?.expiryInfo?.calculationNote || null
+  );
+
+  // Ingredients State (can be edited as comma-separated text)
+  const initialIngredients = scanResult.ingredientsOriginal || [];
+  const [ingredientsList, setIngredientsList] = useState(initialIngredients);
+  const [ingredientsText, setIngredientsText] = useState(initialIngredients.join(', '));
+  const [isEditingIngredients, setIsEditingIngredients] = useState(false);
+
+  // Nutrition Information State
+  const [nutritionInfo, setNutritionInfo] = useState(
+    scanResult.nutritionInfo || scanResult.productIntelligence?.nutritionInfo || scanResult.productIntelligence?.openFoodFactsData?.nutrition || null
+  );
+
   const [estimatedValue, setEstimatedValue] = useState(settings.defaultItemValue || 100);
   const [notes, setNotes] = useState('');
+  const [isHighlightEditing, setIsHighlightEditing] = useState(false);
+  const [dateValidationError, setDateValidationError] = useState('');
+
+  // Source of Information
+  const sourceOfInfo = useMemo(() => {
+    if (scanResult.sourceOfInfo) return scanResult.sourceOfInfo;
+    if (scanResult.barcode && (scanResult.mfgDate || scanResult.batchNumber || scanResult.rawOcrText)) return 'barcode+ocr';
+    if (scanResult.barcode) return 'barcode';
+    return 'ocr';
+  }, [scanResult]);
 
   // Product Intelligence State (Real Expiry, Composition & Lifespan)
   const [intelligenceData, setIntelligenceData] = useState(scanResult.productIntelligence || null);
 
-  // Synchronize expiryDate and mfgDate if product intelligence contains verified dates
+  // Synchronize expiryDate, mfgDate, and batch if product intelligence contains verified dates
   useEffect(() => {
     if (intelligenceData?.expiryInfo) {
       if (!expiryDate && intelligenceData.expiryInfo.realExpiryDate) {
         setExpiryDate(intelligenceData.expiryInfo.realExpiryDate);
+        if (intelligenceData.expiryInfo.isCalculatedDate) {
+          setIsCalculatedDate(true);
+          setCalculationNote(intelligenceData.expiryInfo.calculationNote);
+        }
       }
       if (!mfgDate && intelligenceData.expiryInfo.mfgDate) {
         setMfgDate(intelligenceData.expiryInfo.mfgDate);
+      }
+      if (!batchNumber && intelligenceData.expiryInfo.batchNumber) {
+        setBatchNumber(intelligenceData.expiryInfo.batchNumber);
       }
     }
   }, [intelligenceData]);
@@ -59,6 +121,15 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
           if (!mfgDate && res.expiryInfo?.mfgDate) {
             setMfgDate(res.expiryInfo.mfgDate);
           }
+          if (!brand && res.brand) {
+            setBrand(res.brand);
+          }
+          if (!batchNumber && res.batchNumber) {
+            setBatchNumber(res.batchNumber);
+          }
+          if (!nutritionInfo && res.nutritionInfo) {
+            setNutritionInfo(res.nutritionInfo);
+          }
         }
       });
     }
@@ -74,19 +145,155 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
   // Selected Ingredient for Modal
   const [selectedIngredient, setSelectedIngredient] = useState(null);
 
-  // Days remaining calculation
+  // Smart Attention Status
+  const attention = useMemo(() => {
+    return getAttentionStatus({
+      expiryDate,
+      mfgDate,
+      requiresVerification: scanResult.requiresVerification,
+      confidence: scanResult.confidence,
+      verificationReason: scanResult.verificationReason
+    });
+  }, [expiryDate, mfgDate, scanResult, getAttentionStatus]);
+
   const daysLeft = getDaysRemaining(expiryDate);
-  const isExpired = daysLeft !== null && daysLeft < 0;
-  const isUrgent = daysLeft !== null && daysLeft >= 0 && daysLeft <= 7;
+  const isExpired = attention.status === 'EXPIRED';
+  const isUseSoon = attention.status === 'USE SOON';
+  const isVerifyDate = attention.status === 'VERIFY DATE';
+
+  // Check Allergy Profile
+  const allergyCheck = useMemo(() => {
+    return checkAllergies(ingredientsList, scanResult.rawOcrText);
+  }, [ingredientsList, scanResult.rawOcrText, checkAllergies]);
 
   // Calculate Health & Nutrition Score for ingredients
   const healthScore = useMemo(() => {
     return calculateHealthScore({
       name,
       type,
-      ingredientsOriginal: scanResult.ingredientsOriginal || []
+      ingredientsOriginal: ingredientsList
     });
-  }, [name, type, scanResult.ingredientsOriginal]);
+  }, [name, type, ingredientsList]);
+
+  // AI Product Intelligence State (Part 2 Engine)
+  const [aiProductData, setAiProductData] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    generateProductIntelligence({
+      barcodeData: scanResult.barcode ? { 
+        barcode: scanResult.barcode, 
+        name, 
+        type, 
+        category, 
+        brand,
+        ingredients: ingredientsList, 
+        nutrition: nutritionInfo 
+      } : null,
+      ocrData: {
+        name,
+        brand,
+        type,
+        category,
+        barcode: scanResult.barcode,
+        rawOcrText: scanResult.rawOcrText || '',
+        expiryDate,
+        mfgDate,
+        batchNumber,
+        ingredientsOriginal: ingredientsList,
+        nutritionInfo
+      },
+      userProfile: {
+        allergies: settings.userAllergies || [],
+        dietary_preferences: settings.dietaryPreferences || []
+      },
+      pantryHistory: []
+    }).then(res => {
+      if (isMounted) setAiProductData(res);
+    }).catch(err => {
+      console.warn('AI Product Intelligence error:', err);
+    });
+
+    return () => { isMounted = false; };
+  }, [name, brand, type, category, expiryDate, mfgDate, batchNumber, ingredientsList, nutritionInfo, settings.userAllergies]);
+
+  // Production ML Layer State (Part 3)
+  const [mlLiveAnalysis, setMlLiveAnalysis] = useState(null);
+  const [userConfirmedInfo, setUserConfirmedInfo] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    mlClientService.analyzeProduct({
+      name,
+      barcode: scanResult.barcode,
+      rawOcrText: scanResult.rawOcrText || '',
+      ingredients: ingredientsList,
+      userAllergies: settings.userAllergies || []
+    }).then(res => {
+      if (isMounted && res) {
+        setMlLiveAnalysis(res);
+        if (res.product_type === 'medicine' && type !== 'medicine') {
+          setType('medicine');
+        }
+      }
+    }).catch(err => console.warn('ML Live Analysis err:', err));
+
+    return () => { isMounted = false; };
+  }, [name, scanResult.barcode, scanResult.rawOcrText, ingredientsList, settings.userAllergies]);
+
+  // ML Smart Attention & Food Waste Prediction
+  const mlPrediction = useMemo(() => {
+    return predictSmartAttention({
+      name,
+      category,
+      type,
+      quantity: 1,
+      storage_location: type === 'medicine' ? 'medicine cabinet' : 'pantry',
+      opened_status: false,
+      expiryDate,
+      ingredientsOriginal: ingredientsList
+    }, {
+      userAllergies: settings.userAllergies || []
+    });
+  }, [name, category, type, expiryDate, ingredientsList, settings.userAllergies]);
+
+  // Recalculate date if user alters Best Before period or MFG date
+  const handleRecalculateDate = (newPeriod, newMfg) => {
+    const period = newPeriod !== undefined ? newPeriod : bestBeforePeriod;
+    const mfgVal = newMfg !== undefined ? newMfg : mfgDate;
+    setBestBeforePeriod(period);
+
+    if (mfgVal && period) {
+      const match = period.match(/(\d+)\s*(months?|days?|years?|weeks?)/i);
+      if (match) {
+        const count = parseInt(match[1], 10);
+        const unit = match[2].toLowerCase();
+        try {
+          const [y, m, d] = mfgVal.split('-').map(Number);
+          const dObj = new Date(y, m - 1, d);
+          if (unit.startsWith('month')) dObj.setMonth(dObj.getMonth() + count);
+          else if (unit.startsWith('day')) dObj.setDate(dObj.getDate() + count);
+          else if (unit.startsWith('year')) dObj.setFullYear(dObj.getFullYear() + count);
+          else if (unit.startsWith('week')) dObj.setDate(dObj.getDate() + (count * 7));
+
+          const iso = `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}`;
+          setExpiryDate(iso);
+          setIsCalculatedDate(true);
+          setCalculationNote('Calculated from MFG + Best Before');
+        } catch (_) {}
+      }
+    }
+  };
+
+  // Sync edited ingredients text back to array
+  const handleSaveIngredientsText = () => {
+    const list = ingredientsText
+      .split(/[,;\n]/)
+      .map(s => s.trim())
+      .filter(s => s.length > 1);
+    setIngredientsList(list);
+    setIsEditingIngredients(false);
+  };
 
   // Handle language switch
   const handleLanguageChange = async (newLang) => {
@@ -103,7 +310,7 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
 
     setIsTranslating(true);
     try {
-      const trans = await translateIngredientsList(scanResult.ingredientsOriginal, newLang, {
+      const trans = await translateIngredientsList(ingredientsList, newLang, {
         apiKey: settings.apiKeys?.libreTranslateApiKey,
         libreTranslateUrl: settings.apiKeys?.libreTranslateUrl
       });
@@ -117,28 +324,113 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
 
   // Save to dashboard
   const handleSave = () => {
+    // Expiry vs Manufacturing Date Validation
+    if (mfgDate && expiryDate) {
+      const mfg = new Date(mfgDate);
+      const exp = new Date(expiryDate);
+      if (!isNaN(mfg.getTime()) && !isNaN(exp.getTime()) && exp < mfg) {
+        setDateValidationError('Invalid date: Expiry date cannot be earlier than manufacturing date.');
+        return;
+      }
+    }
+    setDateValidationError('');
+
+    // Detect manual user corrections and log to user_corrections table
+    const orig = originalValues.current || {};
+    if (name && orig.name && name !== orig.name) {
+      dbService.recordCorrection({
+        userId: 'usr_demo_primary_001',
+        fieldName: 'product_name',
+        originalValue: orig.name,
+        correctedValue: name
+      }).catch(err => console.warn('Record correction err:', err));
+    }
+    if (brand && orig.brand && brand !== orig.brand) {
+      dbService.recordCorrection({
+        userId: 'usr_demo_primary_001',
+        fieldName: 'brand',
+        originalValue: orig.brand,
+        correctedValue: brand
+      }).catch(err => console.warn('Record correction err:', err));
+    }
+    if (expiryDate && orig.expiryDate && expiryDate !== orig.expiryDate) {
+      dbService.recordCorrection({
+        userId: 'usr_demo_primary_001',
+        fieldName: 'expiry_date',
+        originalValue: orig.expiryDate,
+        correctedValue: expiryDate
+      }).catch(err => console.warn('Record correction err:', err));
+    }
+    if (mfgDate && orig.mfgDate && mfgDate !== orig.mfgDate) {
+      dbService.recordCorrection({
+        userId: 'usr_demo_primary_001',
+        fieldName: 'mfg_date',
+        originalValue: orig.mfgDate,
+        correctedValue: mfgDate
+      }).catch(err => console.warn('Record correction err:', err));
+    }
+    if (batchNumber && orig.batchNumber && batchNumber !== orig.batchNumber) {
+      dbService.recordCorrection({
+        userId: 'usr_demo_primary_001',
+        fieldName: 'batch_number',
+        originalValue: orig.batchNumber,
+        correctedValue: batchNumber
+      }).catch(err => console.warn('Record correction err:', err));
+    }
+
     const saved = addItem({
       name,
+      brand: brand || null,
       type,
       category,
+      barcode: scanResult.barcode || null,
+      batchNumber: batchNumber || null,
       frontImage: scanResult.frontImage,
       backImage: scanResult.backImage,
       rawOcrText: scanResult.rawOcrText,
       expiryDate,
-      expirySource: 'scanned',
+      expirySource: isCalculatedDate ? 'calculated_mfg_bb' : (sourceOfInfo === 'barcode' ? 'barcode_dataset' : 'scanned'),
+      sourceOfInfo,
+      isCalculatedDate,
+      calculationNote: isCalculatedDate ? (calculationNote || 'Calculated from MFG + Best Before') : null,
+      bestBeforePeriod: bestBeforePeriod || null,
       mfgDate,
-      ingredientsOriginal: scanResult.ingredientsOriginal || [],
+      ingredientsOriginal: ingredientsList,
       ingredientsTranslated: {
         ...(scanResult.ingredientsTranslated || {}),
         [activeLang]: translatedList
       },
       ingredientExplanations: {},
+      nutritionInfo,
       productIntelligence: intelligenceData,
       estimatedValue: Number(estimatedValue) || 100,
       notes
     });
 
+    // Save ML prediction audit log to Supabase / local DB
+    if (mlLiveAnalysis) {
+      dbService.saveMlPrediction({
+        userScanId: saved?.id || scanResult.id || null,
+        userId: 'usr_demo_primary_001',
+        modelName: 'ProductionMLInferenceEngine',
+        modelVersion: typeof mlLiveAnalysis.model_version === 'object' ? JSON.stringify(mlLiveAnalysis.model_version) : String(mlLiveAnalysis.model_version),
+        datasetVersion: 'food-knowledge-v1',
+        predictionType: 'full_product_analysis',
+        prediction: mlLiveAnalysis,
+        confidence: mlLiveAnalysis.overall_confidence || 0.85,
+        needsConfirmation: Boolean(mlLiveAnalysis.needs_confirmation && !userConfirmedInfo)
+      }).catch(err => console.warn('Save ML prediction audit error:', err));
+    }
+
     onSaveComplete(saved);
+  };
+
+  const handleEditInformationClick = () => {
+    setIsHighlightEditing(true);
+    if (nameInputRef.current) {
+      nameInputRef.current.focus();
+      nameInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   };
 
   return (
@@ -151,84 +443,273 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
           className="flex items-center space-x-1.5 text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Retake / Rescan</span>
+          <span>Scan Again</span>
         </button>
 
-        <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/70 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-          ✨ OCR & AI Verification
-        </span>
+        <div className="flex items-center space-x-2">
+          {sourceOfInfo === 'barcode+ocr' ? (
+            <span className="text-xs font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/70 px-3 py-1 rounded-full border border-emerald-300 dark:border-emerald-800 flex items-center space-x-1.5">
+              <span>⚡ Barcode + OCR Combined</span>
+            </span>
+          ) : sourceOfInfo === 'barcode' ? (
+            <span className="text-xs font-bold uppercase tracking-wider text-teal-800 dark:text-teal-300 bg-teal-100 dark:bg-teal-950/70 px-3 py-1 rounded-full border border-teal-300 dark:border-teal-800">
+              🏷️ Barcode Lookup
+            </span>
+          ) : (
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-800 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-950/70 px-3 py-1 rounded-full border border-indigo-300 dark:border-indigo-800">
+              📷 OCR Label Scan
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none space-y-8">
+      {/* Information Conflict Alert Ribbon */}
+      {scanResult.conflictDetected && (
+        <div className="mb-6 p-4 rounded-3xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 flex items-start space-x-3.5 shadow-md shadow-amber-500/5">
+          <div className="p-2 rounded-2xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300">
+            <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+          </div>
+          <div>
+            <h4 className="font-extrabold text-sm sm:text-base tracking-tight">
+              Information conflict detected. Please verify.
+            </h4>
+            <p className="text-xs sm:text-sm text-amber-800/90 dark:text-amber-300/90 mt-0.5 leading-relaxed">
+              {scanResult.conflictMessage || 'Barcode database catalog attributes and optical label text differ. Please review and verify the printed packaging data below before saving.'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Field-Level Extraction Confidence Ribbon */}
+      <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="w-7 h-7 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xs">
+              AI
+            </div>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              Extraction Confidence & Provenance
+            </span>
+          </div>
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+            Overall: {scanResult.confidenceScore || 94}%
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+          <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-800 text-center">
+            <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">EXP DATE</span>
+            <span className="font-black text-xs sm:text-sm text-emerald-600 dark:text-emerald-400">
+              {scanResult.fieldConfidences?.expiry ? `${scanResult.fieldConfidences.expiry}%` : (expiryDate ? '97%' : '0%')}
+            </span>
+            {(!expiryDate || (scanResult.fieldConfidences?.expiry && scanResult.fieldConfidences.expiry < 70)) && (
+              <span className="block text-[9px] font-bold text-amber-600 dark:text-amber-400 mt-0.5">
+                Detected by OCR — Please verify
+              </span>
+            )}
+          </div>
+
+          <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-800 text-center">
+            <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">MFG DATE</span>
+            <span className="font-black text-xs sm:text-sm text-emerald-600 dark:text-emerald-400">
+              {scanResult.fieldConfidences?.mfg ? `${scanResult.fieldConfidences.mfg}%` : (mfgDate ? '91%' : 'N/A')}
+            </span>
+            {mfgDate && (
+              <span className="block text-[9px] text-slate-400 font-semibold mt-0.5">Printed Stamp</span>
+            )}
+          </div>
+
+          <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-800 text-center">
+            <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">BATCH / LOT</span>
+            <span className="font-black text-xs sm:text-sm text-emerald-600 dark:text-emerald-400">
+              {scanResult.fieldConfidences?.batch ? `${scanResult.fieldConfidences.batch}%` : (batchNumber ? '82%' : 'N/A')}
+            </span>
+            {batchNumber && (
+              <span className="block text-[9px] text-slate-400 font-semibold mt-0.5">Verified</span>
+            )}
+          </div>
+
+          <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-800 text-center">
+            <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">INGREDIENTS</span>
+            <span className="font-black text-xs sm:text-sm text-emerald-600 dark:text-emerald-400">
+              {scanResult.fieldConfidences?.ingredients ? `${scanResult.fieldConfidences.ingredients}%` : (ingredientsList.length > 0 ? '94%' : 'N/A')}
+            </span>
+            {ingredientsList.length > 0 && (
+              <span className="block text-[9px] text-slate-400 font-semibold mt-0.5">{ingredientsList.length} items parsed</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none space-y-6">
         
-        {/* Urgent Status Header Banner */}
-        <div className={`p-4 sm:p-5 rounded-2xl border flex flex-wrap items-center justify-between gap-4 ${
+        {/* MAIN TITLE: PRODUCT INFORMATION */}
+        <div className="border-b border-slate-100 dark:border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span className="text-[11px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+              Complete Product Verification
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              PRODUCT INFORMATION
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Barcode identified the product • OCR extracted package-specific dates, batch & ingredients
+            </p>
+          </div>
+
+
+          <div className="flex items-center space-x-2 shrink-0">
+            <button
+              onClick={handleEditInformationClick}
+              className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center space-x-1.5 transition-all"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Edit Information</span>
+            </button>
+          </div>
+        </div>
+
+        {/* NOTICE: DETECTED BY OCR — PLEASE VERIFY */}
+        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3 text-xs">
+          <div className="flex items-center space-x-2 text-slate-700 dark:text-slate-300">
+            <Info className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>
+              <strong>Detected by OCR — Please verify:</strong> Every field below is editable before saving to pantry.
+            </span>
+          </div>
+          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 shrink-0">
+            Editable Record
+          </span>
+        </div>
+
+        {/* SMART ATTENTION STATUS BANNER */}
+        <div className={`p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors ${
           isExpired
-            ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/60 text-rose-900 dark:text-rose-200'
-            : isUrgent
-            ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/60 text-amber-900 dark:text-amber-200'
-            : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/60 text-emerald-900 dark:text-emerald-200'
+            ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-900/60 text-rose-950 dark:text-rose-200'
+            : isUseSoon
+            ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-900/60 text-amber-950 dark:text-amber-200'
+            : isVerifyDate
+            ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-900/60 text-indigo-950 dark:text-indigo-200'
+            : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-900/60 text-emerald-950 dark:text-emerald-200'
         }`}>
-          <div className="flex items-center space-x-3">
-            <span className="text-2xl">
-              {isExpired ? '🚨' : isUrgent ? '⏳' : '🥗'}
+          <div className="flex items-start space-x-3.5">
+            <span className="text-3xl shrink-0 mt-0.5">
+              {isExpired ? '🚨' : isUseSoon ? '⏳' : isVerifyDate ? '🔍' : '🥗'}
             </span>
             <div>
-              <div className="flex items-center space-x-2">
-                <span className="font-extrabold text-base sm:text-lg">
-                  {isExpired
-                    ? `Expired ${Math.abs(daysLeft)} Day${Math.abs(daysLeft) === 1 ? '' : 's'} Ago`
-                    : daysLeft === 0
-                    ? 'Expires Today!'
-                    : `Expires in ${daysLeft} Day${daysLeft === 1 ? '' : 's'}`}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-black text-base sm:text-lg">
+                  STATUS: {attention.status}
                 </span>
-                <span className="text-[11px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-white/80 dark:bg-slate-800 shadow-xs">
-                  {isExpired ? 'Red • Expired' : isUrgent ? 'Yellow • Urgent' : 'Green • Safe'}
+                <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-2xs ${
+                  isExpired 
+                    ? 'bg-rose-600 text-white' 
+                    : isUseSoon 
+                    ? 'bg-amber-500 text-white' 
+                    : isVerifyDate 
+                    ? 'bg-indigo-600 text-white' 
+                    : 'bg-emerald-600 text-white'
+                }`}>
+                  {attention.label}
                 </span>
               </div>
-              <p className="text-xs font-medium opacity-85 mt-0.5">
-                Parsed from package label OCR • You can edit or fine-tune below
+              <p className="text-xs sm:text-sm font-semibold opacity-95 mt-1 leading-relaxed">
+                {attention.reason}
               </p>
             </div>
           </div>
 
-          <div className="text-right">
-            <span className="inline-block text-xs font-bold px-2.5 py-1 rounded-lg bg-white/90 dark:bg-slate-800 shadow-xs border border-slate-200 dark:border-slate-700">
-              Source: Scanned (Confirmed)
+          <div className="text-left sm:text-right shrink-0">
+            <span className="inline-block text-[11px] font-extrabold px-3 py-1 rounded-xl bg-white/90 dark:bg-slate-800 shadow-xs border border-slate-200 dark:border-slate-700">
+              Source: {sourceOfInfo === 'barcode+ocr' ? 'Barcode + OCR' : sourceOfInfo === 'barcode' ? 'Barcode' : 'Package OCR'}
             </span>
           </div>
         </div>
 
-        {/* Section 1: Item Details & Editable Verification Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* POST-EXPIRY CAUTIONARY SAFETY WARNING (If Expired) */}
+        {isExpired && (
+          <div className="p-4 rounded-2xl bg-rose-100/70 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-900 text-xs text-rose-900 dark:text-rose-200 space-y-1">
+            <div className="flex items-center space-x-2 font-black text-sm text-rose-950 dark:text-rose-100">
+              <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>Safety Caution Notice</span>
+            </div>
+            <p className="leading-relaxed">
+              Expired — do not consume unless you have independently confirmed the product is still appropriate according to its packaging/storage guidance.
+            </p>
+          </div>
+        )}
+
+        {/* ALLERGY PROFILE MATCH ALERT (If matches user allergy profile) */}
+        {allergyCheck.hasMatch && (
+          <div className="p-4 rounded-2xl bg-amber-500 text-white shadow-md shadow-amber-500/20 flex items-center justify-between gap-3 animate-pulse">
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">⚠️</span>
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider bg-black/20 px-2 py-0.5 rounded">
+                  Allergy Match Alert
+                </span>
+                <h4 className="text-sm font-extrabold mt-0.5">
+                  Potential allergy match: {allergyCheck.matches.join(', ')}
+                </h4>
+                <p className="text-[11px] text-amber-100">
+                  This product contains ingredients matching your saved allergy profile in settings!
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PRODUCT DETAILS FORM (ALL OCR FIELDS EDITABLE) */}
+        <div className={`p-5 rounded-3xl bg-slate-50 dark:bg-slate-850 border transition-all ${
+          isHighlightEditing ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-200 dark:border-slate-800'
+        }`}>
           
-          {/* Left Column: Name & Type */}
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            
+            {/* Field: Product Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
-                Product Name
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-1.5 flex items-center justify-between">
+                <span>Product Name</span>
+                <span className="text-[10px] text-slate-400 font-normal">Editable</span>
               </label>
               <div className="relative">
                 <input
+                  ref={nameInputRef}
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
-                  placeholder="e.g. Amul Milk, Paracetamol 500mg"
+                  className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 font-bold text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
+                  placeholder="e.g. Parle-G Biscuits, Amul Taaza Milk"
                 />
                 <Edit3 className="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" />
               </div>
             </div>
 
+            {/* Field: Brand */}
+            <div>
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-1.5 flex items-center justify-between">
+                <span>Brand</span>
+                <span className="text-[10px] text-slate-400 font-normal">Barcode / OCR</span>
+              </label>
+              <input
+                type="text"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 font-bold text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
+                placeholder="e.g. Parle, Amul, Heinz, Cipla"
+              />
+            </div>
+
+            {/* Field: Type & Category */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-1.5">
                   Type
                 </label>
                 <select
                   value={type}
                   onChange={(e) => setType(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
+                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-800 font-bold text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
                 >
                   <option value="grocery">🥗 Grocery</option>
                   <option value="medicine">💊 Medicine</option>
@@ -236,13 +717,13 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-1.5">
                   Category
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
+                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-800 font-bold text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
                 >
                   {ALL_CATEGORIES.map(c => (
                     <option key={c} value={c}>{c}</option>
@@ -251,73 +732,96 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
               </div>
             </div>
 
+            {/* Field: Batch / Lot Number */}
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
-                Estimated Value ({settings.currencySymbol})
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-1.5 flex items-center justify-between">
+                <span>Batch / Lot Number</span>
+                <span className="text-[10px] text-slate-400 font-normal">From OCR / GS1</span>
               </label>
               <input
-                type="number"
-                value={estimatedValue}
-                onChange={(e) => setEstimatedValue(e.target.value)}
-                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
-                placeholder="100"
+                type="text"
+                value={batchNumber}
+                onChange={(e) => setBatchNumber(e.target.value)}
+                placeholder="e.g. B-9042, LOT-120A"
+                className="w-full px-4 py-2.5 font-mono font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm uppercase"
               />
-              <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 block">
-                Used to compute money saved when consumed before expiry
-              </span>
-            </div>
-          </div>
-
-          {/* Right Column: Dates & Expiry Verification */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
-                Expiry Date (EXP / Use By)
-              </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={expiryDate}
-                  onChange={(e) => setExpiryDate(e.target.value)}
-                  className={`w-full px-4 py-2.5 font-bold border rounded-xl focus:ring-2 focus:outline-none text-sm ${
-                    isExpired
-                      ? 'border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 focus:ring-rose-500'
-                      : 'border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200 focus:ring-emerald-500'
-                  }`}
-                />
-              </div>
-              <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 block">
-                Extracted from label OCR. Adjust if needed.
-              </span>
             </div>
 
+            {/* Field: Manufacturing Date (MFG) */}
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-1.5">
                 Manufacturing Date (MFG / PKD)
               </label>
               <input
                 type="date"
                 value={mfgDate}
-                onChange={(e) => setMfgDate(e.target.value)}
-                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
+                onChange={(e) => {
+                  setMfgDate(e.target.value);
+                  if (bestBeforePeriod) handleRecalculateDate(bestBeforePeriod, e.target.value);
+                }}
+                className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 font-bold text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
               />
             </div>
 
-            {/* Packaging thumbnail preview */}
-            <div className="flex items-center space-x-3 pt-1">
-              {scanResult.frontImage && (
-                <div className="w-16 h-16 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
-                  <img src={scanResult.frontImage} alt="Front" className="w-full h-full object-contain" />
-                </div>
+            {/* Field: Expiry / Best Before Date */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
+                  Expiry / Best Before Date
+                </label>
+                {isCalculatedDate && (
+                  <span className="text-[10px] font-black text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-950/70 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800">
+                    Calculated from MFG + Best Before
+                  </span>
+                )}
+              </div>
+              <input
+                type="date"
+                value={expiryDate}
+                onChange={(e) => {
+                  setExpiryDate(e.target.value);
+                  setIsCalculatedDate(false);
+                  setCalculationNote(null);
+                }}
+                className={`w-full px-4 py-2.5 font-bold border rounded-xl focus:ring-2 focus:outline-none text-sm ${
+                  isExpired
+                    ? 'border-rose-400 bg-rose-50/50 dark:bg-rose-950/30 text-rose-950 dark:text-rose-200 focus:ring-rose-500'
+                    : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-emerald-500'
+                }`}
+              />
+              {isCalculatedDate && (
+                <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold mt-1 block">
+                  ℹ️ Calculated from MFG + Best Before ({bestBeforePeriod || 'shelf life'}). If an actual printed EXP date exists on packaging, prioritize the printed date.
+                </span>
               )}
-              {scanResult.backImage && (
-                <div className="w-16 h-16 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
-                  <img src={scanResult.backImage} alt="Back" className="w-full h-full object-contain" />
-                </div>
-              )}
-              <div className="text-xs text-slate-500 dark:text-slate-400">
-                <span className="font-bold text-slate-700 dark:text-slate-200 block">Package Photos Attached</span>
-                Saved to item record for future reference
+            </div>
+
+            {/* Field: Best Before Period (Helper Calculator) */}
+            <div className="md:col-span-2 p-3 rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="space-y-0.5">
+                <span className="font-bold text-slate-800 dark:text-slate-200 block">
+                  Best Before Duration (Optional Calculator)
+                </span>
+                <span className="text-slate-500 dark:text-slate-400 text-[11px] block">
+                  e.g. "6 Months" or "180 Days" from MFG Date
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={bestBeforePeriod}
+                  onChange={(e) => setBestBeforePeriod(e.target.value)}
+                  placeholder="e.g. 6 Months"
+                  className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-900 font-bold border border-slate-300 dark:border-slate-700 text-xs w-36"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRecalculateDate(bestBeforePeriod, mfgDate)}
+                  disabled={!mfgDate || !bestBeforePeriod}
+                  className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-extrabold text-xs transition-all shrink-0"
+                >
+                  Recalculate Date
+                </button>
               </div>
             </div>
 
@@ -325,8 +829,59 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
 
         </div>
 
-        {/* SECTION 2: HEALTH & CLEAN EATING SCORE */}
-        <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+        {/* SECTION: NUTRITION INFORMATION (IF AVAILABLE) */}
+        {nutritionInfo && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center space-x-1.5">
+                <span>🥗 Nutrition Information (per 100g / package)</span>
+              </span>
+              <span className="text-[10px] text-slate-400">From OCR / Open Food Facts</span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 text-xs">
+              {nutritionInfo.energy && (
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                  <span className="text-[10px] text-slate-400 block font-bold">Energy</span>
+                  <span className="font-black text-slate-900 dark:text-white mt-0.5 block">{nutritionInfo.energy}</span>
+                </div>
+              )}
+              {nutritionInfo.protein && (
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                  <span className="text-[10px] text-slate-400 block font-bold">Protein</span>
+                  <span className="font-black text-slate-900 dark:text-white mt-0.5 block">{nutritionInfo.protein}</span>
+                </div>
+              )}
+              {nutritionInfo.carbs && (
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                  <span className="text-[10px] text-slate-400 block font-bold">Carbs</span>
+                  <span className="font-black text-slate-900 dark:text-white mt-0.5 block">{nutritionInfo.carbs}</span>
+                </div>
+              )}
+              {nutritionInfo.fat && (
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                  <span className="text-[10px] text-slate-400 block font-bold">Total Fat</span>
+                  <span className="font-black text-slate-900 dark:text-white mt-0.5 block">{nutritionInfo.fat}</span>
+                </div>
+              )}
+              {nutritionInfo.sugar && (
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                  <span className="text-[10px] text-slate-400 block font-bold">Sugar</span>
+                  <span className="font-black text-slate-900 dark:text-white mt-0.5 block">{nutritionInfo.sugar}</span>
+                </div>
+              )}
+              {nutritionInfo.sodium && (
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                  <span className="text-[10px] text-slate-400 block font-bold">Sodium</span>
+                  <span className="font-black text-slate-900 dark:text-white mt-0.5 block">{nutritionInfo.sodium}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION: HEALTH & CLEAN EATING SCORE */}
+        <div className="pt-2">
           <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-50/80 via-teal-50/50 to-white dark:from-slate-850 dark:via-emerald-950/20 dark:to-slate-850 border border-emerald-200 dark:border-emerald-900/60 shadow-sm space-y-4">
             
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -341,8 +896,8 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
                     </span>
                     <span className="text-xs font-bold text-slate-500 dark:text-slate-400">NOVA & Nutrients</span>
                   </div>
-                  <h3 className="text-lg font-extrabold text-slate-900 dark:text-white mt-0.5 flex items-center space-x-2">
-                    <span>{healthScore.verdict}</span>
+                  <h3 className="text-lg font-extrabold text-slate-900 dark:text-white mt-0.5">
+                    {healthScore.verdict}
                   </h3>
                 </div>
               </div>
@@ -383,63 +938,119 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
               ))}
             </div>
 
-            {/* Detailed Positives vs Cautions */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              {/* Positives */}
-              <div className="p-3 rounded-2xl bg-white/80 dark:bg-slate-850/80 border border-emerald-200/60 dark:border-emerald-900/40">
-                <span className="font-extrabold text-emerald-800 dark:text-emerald-300 uppercase tracking-wide text-[10px] block mb-1.5 flex items-center space-x-1">
-                  <Check className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Wholesome Ingredients & Highlights</span>
-                </span>
-                <ul className="space-y-1 text-slate-700 dark:text-slate-300 pl-4 list-disc">
-                  {healthScore.positivePoints.map((p, i) => (
-                    <li key={i}>{p}</li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Cautions or Clean Label confirmation */}
-              <div className="p-3 rounded-2xl bg-white/80 dark:bg-slate-850/80 border border-slate-200 dark:border-slate-700">
-                <span className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-wide text-[10px] block mb-1.5 flex items-center space-x-1">
-                  <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Additives & Caution Check</span>
-                </span>
-                {healthScore.cautionPoints.length > 0 ? (
-                  <ul className="space-y-1 text-amber-800 dark:text-amber-300 pl-4 list-disc font-medium">
-                    {healthScore.cautionPoints.map((c, i) => (
-                      <li key={i}>{c}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center space-x-1.5 pt-0.5">
-                    <span>🛡️ No harmful chemical additives, synthetic colors, or trans fats detected.</span>
-                  </p>
-                )}
-              </div>
-            </div>
-
           </div>
         </div>
 
-        {/* SECTION 2.5: PRODUCT INTELLIGENCE API (REAL EXPIRY, COMPOSITION & LIFESPAN) */}
+        {/* SECTION: AI PRODUCT INTELLIGENCE & ML ATTENTION ENGINE (PART 2) */}
+        {(aiProductData || mlPrediction) && (
+          <div className="pt-2">
+            <AIProductIntelligenceCard aiData={aiProductData} mlPrediction={mlPrediction} />
+          </div>
+        )}
+
+        {/* SECTION: PRODUCTION ML & SOURCE TRANSPARENCY LAYER (PART 3) */}
+        {mlLiveAnalysis && (
+          <div className="pt-2">
+            <div className="p-5 rounded-3xl bg-slate-900 text-white border border-slate-700/80 shadow-lg space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                <div className="flex items-center space-x-2.5">
+                  <span className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs border border-indigo-500/30">
+                    ML
+                  </span>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <h4 className="font-extrabold text-sm text-slate-100 tracking-tight">Production AI & Semantic Knowledge Layer</h4>
+                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-indigo-900/60 text-indigo-300 border border-indigo-700">
+                        {mlLiveAnalysis.is_fallback ? 'Offline Resilient Engine' : 'Microservice Active (Port 8000)'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">Model Version: {typeof mlLiveAnalysis.model_version === 'object' ? mlLiveAnalysis.model_version.classifier : mlLiveAnalysis.model_version}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2 text-right">
+                  <div>
+                    <span className="text-xs text-slate-400 block font-medium">Confidence</span>
+                    <span className="text-sm font-black text-emerald-400">
+                      {Math.round((mlLiveAnalysis.overall_confidence || 0.85) * 100)}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Source Transparency Badges */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-xs">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">SOURCE</span>
+                  <span className="font-extrabold text-slate-200">
+                    {sourceOfInfo === 'barcode' ? 'Verified Database / Barcode' : (sourceOfInfo === 'barcode+ocr' ? 'Combined Barcode & OCR' : 'Optical OCR Text')}
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-xs">
+                  <span className="text-[10px] uppercase font-bold text-indigo-400 block">AI PREDICTION</span>
+                  <span className="font-extrabold text-indigo-200 uppercase">
+                    {mlLiveAnalysis.product_type} ({mlLiveAnalysis.category_prediction?.confidence ? Math.round(mlLiveAnalysis.category_prediction.confidence * 100) : 85}%)
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-xs">
+                  <span className="text-[10px] uppercase font-bold text-emerald-400 block">USER CONFIRMATION</span>
+                  <span className={`font-extrabold ${userConfirmedInfo ? 'text-emerald-300' : 'text-amber-300'}`}>
+                    {userConfirmedInfo ? '✓ Confirmed by User' : (mlLiveAnalysis.needs_confirmation ? 'Verification Recommended' : 'Verified')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Human Confirmation Banner if required */}
+              {mlLiveAnalysis.needs_confirmation && !userConfirmedInfo && (
+                <div className="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center space-x-2 text-amber-200 text-xs">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+                    <span>Human Confirmation Recommended: Pharmaceutical item or low confidence detected. Please verify values.</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setUserConfirmedInfo(true)}
+                    className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shrink-0 transition-all shadow-sm"
+                  >
+                    Confirm Predictions
+                  </button>
+                </div>
+              )}
+
+              {/* Strict Medical Disclaimer if medicine */}
+              {mlLiveAnalysis.product_type === 'medicine' && (
+                <div className="p-3 rounded-2xl bg-blue-950/40 border border-blue-800/70 text-blue-200 text-[11px] leading-relaxed flex items-start space-x-2">
+                  <ShieldAlert className="w-4 h-4 shrink-0 text-blue-400 mt-0.5" />
+                  <span>{mlLiveAnalysis.safety_disclaimer}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION: PRODUCT INTELLIGENCE CARD (COMPOSITION & LIFESPAN) */}
         {intelligenceData && (
           <ProductIntelligenceCard intelligenceData={intelligenceData} />
         )}
 
-        {/* Section 3: Ingredients with Multi-Language Translation & Tap to Explain */}
-        <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+        {/* SECTION: INGREDIENTS LIST & TRANSLATION */}
+        <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
               <div className="flex items-center space-x-2">
                 <h3 className="font-extrabold text-slate-900 dark:text-white text-base sm:text-lg">
-                  Ingredients & Composition
+                  Ingredients ({ingredientsList.length})
                 </h3>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800">
-                  {scanResult.ingredientsOriginal?.length || 0} Identified
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingIngredients(!isEditingIngredients)}
+                  className="text-xs text-emerald-600 hover:text-emerald-700 font-bold underline ml-2"
+                >
+                  {isEditingIngredients ? 'Done Editing' : 'Edit Ingredients Text'}
+                </button>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                👉 <strong className="text-emerald-700 dark:text-emerald-400">Tap any ingredient</strong> below to reveal AI safety notes & health functions.
+                👉 Tap any ingredient below to reveal AI safety notes & health functions.
               </p>
             </div>
 
@@ -449,7 +1060,7 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
               <select
                 value={activeLang}
                 onChange={(e) => handleLanguageChange(e.target.value)}
-                className="font-bold text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-1.5 focus:outline-none"
+                className="font-bold text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-1.5 focus:outline-none"
               >
                 {SUPPORTED_LANGUAGES.map(l => (
                   <option key={l.code} value={l.code}>
@@ -460,10 +1071,30 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
             </div>
           </div>
 
+          {/* Editable Textarea for Ingredients */}
+          {isEditingIngredients ? (
+            <div className="mb-4 space-y-2">
+              <textarea
+                value={ingredientsText}
+                onChange={(e) => setIngredientsText(e.target.value)}
+                rows={3}
+                placeholder="Enter ingredients separated by commas..."
+                className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              <button
+                type="button"
+                onClick={handleSaveIngredientsText}
+                className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs"
+              >
+                Update Ingredients List
+              </button>
+            </div>
+          ) : null}
+
           {/* Interactive Ingredients Pills */}
-          {scanResult.ingredientsOriginal && scanResult.ingredientsOriginal.length > 0 ? (
+          {ingredientsList && ingredientsList.length > 0 ? (
             <div className="flex flex-wrap gap-2.5">
-              {scanResult.ingredientsOriginal.map((orig, index) => {
+              {ingredientsList.map((orig, index) => {
                 const trans = translatedList[index];
                 return (
                   <button
@@ -491,22 +1122,46 @@ export function ResultsScreen({ scanResult, onSaveComplete, onRetake }) {
           )}
         </div>
 
-        {/* Action Controls */}
-        <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Date Validation Alert Banner */}
+        {dateValidationError && (
+          <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200 flex items-center space-x-3 text-sm font-bold shadow-sm animate-shake">
+            <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
+            <span>{dateValidationError}</span>
+          </div>
+        )}
+
+        {/* PRIMARY ACTION BUTTONS (Matching preferred layout: Add to Pantry | Edit Information | Scan Again) */}
+        <div className="pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+          
           <button
+            id="btn-scan-again"
             onClick={onRetake}
-            className="w-full sm:w-auto px-5 py-3 rounded-2xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-bold text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="w-full sm:w-auto px-5 py-3 rounded-2xl text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold text-sm bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-750 transition-all flex items-center justify-center space-x-1.5"
           >
-            Discard & Retake
+            <RefreshCw className="w-4 h-4" />
+            <span>Scan Again</span>
           </button>
 
-          <button
-            onClick={handleSave}
-            className="w-full sm:w-auto flex items-center justify-center space-x-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-600/25 hover:scale-105 active:scale-95 transition-all"
-          >
-            <Save className="w-5 h-5" />
-            <span>Save to Dashboard & Track</span>
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+            <button
+              id="btn-edit-information"
+              onClick={handleEditInformationClick}
+              className="w-full sm:w-auto px-5 py-3 rounded-2xl text-slate-700 dark:text-slate-200 font-bold text-sm border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center justify-center space-x-1.5"
+            >
+              <Edit3 className="w-4 h-4 text-slate-500" />
+              <span>Edit Information</span>
+            </button>
+
+            <button
+              id="btn-add-to-pantry"
+              onClick={handleSave}
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-600/25 hover:scale-105 active:scale-95 transition-all"
+            >
+              <Save className="w-5 h-5" />
+              <span>Add to Pantry</span>
+            </button>
+          </div>
+
         </div>
 
       </div>

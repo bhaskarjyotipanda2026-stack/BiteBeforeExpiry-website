@@ -1,14 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Settings, Bell, Clock, ShieldCheck, Key, RefreshCw, 
-  Trash2, Languages, DollarSign, Sparkles, Check, Info, AlertTriangle
+  Trash2, Languages, DollarSign, Sparkles, Check, Info, AlertTriangle,
+  User, Database, ShieldAlert, LogOut
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { SUPPORTED_LANGUAGES, DEFAULT_SETTINGS } from '../../constants';
+import { useAuth } from '../../context/AuthContext';
+import { SUPPORTED_LANGUAGES, DEFAULT_SETTINGS, COMMON_ALLERGENS } from '../../constants';
 import { ALARM_SOUND_TYPES, WARNING_SIGN_OPTIONS, previewAlarmSound } from '../../services/alarmSoundService';
+
+const DIETARY_OPTIONS = [
+  'Vegetarian',
+  'Vegan',
+  'Gluten-Free',
+  'Dairy-Free',
+  'Halal',
+  'Kosher',
+  'Low Sodium',
+  'Diabetic Friendly'
+];
 
 export function SettingsScreen() {
   const { settings, setSettings, showToast, resetToSampleData } = useApp();
+  const { user, profile, updateProfile, logout, isSupabaseConnected } = useAuth();
+
+  // Profile Form state
+  const [userName, setUserName] = useState(user?.name || 'Smart Pantry User');
+  const [dietaryPrefs, setDietaryPrefs] = useState(profile?.dietary_preferences || ['Vegetarian']);
 
   // Local form state
   const [leadDays, setLeadDays] = useState(settings.notificationLeadDays || 3);
@@ -21,6 +39,8 @@ export function SettingsScreen() {
   const [prefLang, setPrefLang] = useState(settings.preferredLanguage || 'en');
   const [currency, setCurrency] = useState(settings.currencySymbol || '₹');
   const [defaultValue, setDefaultValue] = useState(settings.defaultItemValue || 120);
+  const [allergyProfile, setAllergyProfile] = useState(settings.allergyProfile || []);
+
 
   // API Keys state with {{API_KEY_HERE}} defaults
   const [openaiKey, setOpenaiKey] = useState(settings.apiKeys?.openaiApiKey || '{{API_KEY_HERE}}');
@@ -31,9 +51,22 @@ export function SettingsScreen() {
 
   const [savedSuccess, setSavedSuccess] = useState(false);
 
+  const toggleAllergen = (allergen) => {
+    const next = allergyProfile.includes(allergen) 
+      ? allergyProfile.filter(a => a !== allergen) 
+      : [...allergyProfile, allergen];
+    setAllergyProfile(next);
+    setSettings(prev => ({
+      ...prev,
+      allergyProfile: next
+    }));
+    showToast(`Updated allergy profile: ${next.length} active`, 'info');
+  };
+
   // Save settings immediately
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
+
 
     const updated = {
       ...settings,
@@ -49,6 +82,7 @@ export function SettingsScreen() {
       preferredLanguage: prefLang,
       currencySymbol: currency,
       defaultItemValue: Number(defaultValue),
+      allergyProfile: allergyProfile,
       apiKeys: {
         openaiApiKey: openaiKey,
         claudeApiKey: claudeKey,
@@ -59,9 +93,33 @@ export function SettingsScreen() {
     };
 
     setSettings(updated);
+
+    // Save to Database User Profile table
+    try {
+      await updateProfile({
+        allergies: allergyProfile,
+        dietary_preferences: dietaryPrefs,
+        preferred_language: prefLang,
+        notification_preferences: {
+          lead_days: Number(leadDays),
+          banner_enabled: barEnabled,
+          category_overrides: {
+            medicine: Number(medicineOverride),
+            grocery: Number(groceryOverride)
+          }
+        }
+      });
+    } catch (err) {
+      console.warn('DB profile update err:', err);
+    }
+
     setSavedSuccess(true);
-    showToast('Settings saved immediately! Dashboard alerts updated.', 'success');
+    showToast('Settings & User Profile saved to Database!', 'success');
     setTimeout(() => setSavedSuccess(false), 3000);
+  };
+
+  const toggleDiet = (diet) => {
+    setDietaryPrefs(prev => prev.includes(diet) ? prev.filter(d => d !== diet) : [...prev, diet]);
   };
 
   return (
@@ -71,14 +129,91 @@ export function SettingsScreen() {
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center space-x-2">
           <Settings className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
-          <span>Notification & App Settings</span>
+          <span>Profile & App Settings</span>
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Configure expiry lead times, persistent notification banners, language, and API keys. Changes take effect instantly without page reloads.
+          Configure personal dietary preferences, allergy triggers, expiry lead times, and database synchronization.
         </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
+
+        {/* Section 0: Real Database & User Profile */}
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-md shadow-slate-100 dark:shadow-none space-y-6">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                <User className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
+                  User Account & Database Profile
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Data foundation synced with PostgreSQL and protected by Row-Level Security
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                <Database className="w-3.5 h-3.5 text-emerald-600" />
+                <span>{isSupabaseConnected ? 'Supabase Live' : 'Offline-First DB'}</span>
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">
+                Profile Name
+              </label>
+              <input
+                type="text"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">
+                Account Email
+              </label>
+              <input
+                type="email"
+                disabled
+                value={user?.email || 'demo@bitebeforeexpiry.com'}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-sm cursor-not-allowed"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-2">
+              Dietary Preferences
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {DIETARY_OPTIONS.map((diet) => {
+                const isSelected = dietaryPrefs.includes(diet);
+                return (
+                  <button
+                    key={diet}
+                    type="button"
+                    onClick={() => toggleDiet(diet)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                      isSelected
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-400'
+                    }`}
+                  >
+                    {diet} {isSelected && '✓'}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
         
         {/* Section 1: Notification Settings (Lead Times & Banner Toggle) */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-md shadow-slate-100 dark:shadow-none space-y-6">
@@ -95,6 +230,7 @@ export function SettingsScreen() {
               </p>
             </div>
           </div>
+
 
           {/* 1. Global Lead Time Selector */}
           <div>
@@ -384,6 +520,63 @@ export function SettingsScreen() {
                 className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl text-sm"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Section 2.5: Saved Allergy & Dietary Profile */}
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-md shadow-slate-100 dark:shadow-none space-y-4">
+          <div className="flex items-center space-x-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 flex items-center justify-center text-xl">
+              🛡️
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
+                  Personal Allergy & Intolerance Profile
+                </h2>
+                <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                  OCR Scanner Integration
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Select ingredients you or your family are allergic to. OCR and barcode scanning will automatically highlight matching allergen risks.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-2.5">
+              Select Your Allergens:
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {COMMON_ALLERGENS.map((allergen) => {
+                const isSelected = allergyProfile.includes(allergen);
+                return (
+                  <button
+                    type="button"
+                    key={allergen}
+                    onClick={() => toggleAllergen(allergen)}
+                    className={`px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all border flex items-center space-x-2 ${
+                      isSelected
+                        ? 'bg-rose-500 text-white border-rose-500 shadow-md shadow-rose-500/20 scale-102'
+                        : 'bg-white dark:bg-slate-850 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                    }`}
+                  >
+                    <span>{isSelected ? '⚠️' : '⚪'}</span>
+                    <span>{allergen}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {allergyProfile.length > 0 ? (
+              <p className="text-xs text-rose-600 dark:text-rose-400 font-semibold mt-3">
+                Active alerts enabled for: <strong>{allergyProfile.join(', ')}</strong>
+              </p>
+            ) : (
+              <p className="text-xs text-slate-400 mt-2">
+                No personal allergies configured. Extracted ingredients will be displayed with standard nutritional analysis.
+              </p>
+            )}
           </div>
         </div>
 

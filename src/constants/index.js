@@ -108,6 +108,18 @@ export const BADGES_DEFINITION = [
   }
 ];
 
+export const COMMON_ALLERGENS = [
+  'Milk & Lactose',
+  'Gluten (Wheat)',
+  'Soybeans & Soy',
+  'Peanuts',
+  'Tree Nuts',
+  'Eggs',
+  'Fish & Seafood',
+  'Mustard',
+  'Sesame Seeds'
+];
+
 export const DEFAULT_SETTINGS = {
   notificationLeadDays: 3,
   notificationBarEnabled: true,
@@ -121,6 +133,7 @@ export const DEFAULT_SETTINGS = {
   alarmSoundDefault: 'siren',
   autoAlarmEnabled: true,
   defaultWarningSign: 'flashing-siren',
+  allergyProfile: [], // Saved user allergy profile (e.g. ['Milk & Lactose', 'Peanuts'])
   apiKeys: {
     openaiApiKey: '{{API_KEY_HERE}}',
     claudeApiKey: '{{API_KEY_HERE}}',

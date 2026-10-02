@@ -1,0 +1,3900 @@
+{
+  "version": "semantic-v1",
+  "total_nodes": 288,
+  "total_edges": 377,
+  "nodes": {
+    "food_001": {
+      "type": "Product",
+      "name": "Amul Taaza Homogenised Toned Milk",
+      "brand": "Amul",
+      "product_type": "food",
+      "category": "Dairy & Milk Products"
+    },
+    "ing_toned_milk": {
+      "type": "Ingredient",
+      "name": "toned milk",
+      "category": "Dairy Base",
+      "allergen": "Milk & Dairy",
+      "explanation": "Pasteurized cow/buffalo milk with fat content standardized to ~3%."
+    },
+    "allergen_milk_and_dairy": {
+      "type": "Allergen",
+      "name": "Milk & Dairy",
+      "description": "Recognized high-risk allergen trigger: Milk & Dairy"
+    },
+    "ing_vitamin_a": {
+      "type": "Ingredient",
+      "name": "vitamin a",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Amul Taaza Homogenised Toned Milk."
+    },
+    "ing_vitamin_d": {
+      "type": "Ingredient",
+      "name": "vitamin d",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Amul Taaza Homogenised Toned Milk."
+    },
+    "food_002": {
+      "type": "Product",
+      "name": "Britannia 100% Whole Wheat Bread",
+      "brand": "Britannia",
+      "product_type": "food",
+      "category": "Bakery & Bread"
+    },
+    "ing_whole_wheat_flour": {
+      "type": "Ingredient",
+      "name": "whole wheat flour",
+      "category": "Whole Grain",
+      "allergen": "Gluten & Wheat",
+      "explanation": "Milled whole grain including bran, germ, and endosperm."
+    },
+    "allergen_gluten_and_wheat": {
+      "type": "Allergen",
+      "name": "Gluten & Wheat",
+      "description": "Recognized high-risk allergen trigger: Gluten & Wheat"
+    },
+    "ing_water": {
+      "type": "Ingredient",
+      "name": "water",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Britannia 100% Whole Wheat Bread."
+    },
+    "ing_yeast": {
+      "type": "Ingredient",
+      "name": "yeast",
+      "category": "Leavening Agent",
+      "allergen": null,
+      "explanation": "Microorganism that ferments sugars producing carbon dioxide to rise bread dough."
+    },
+    "ing_sugar": {
+      "type": "Ingredient",
+      "name": "sugar",
+      "category": "Simple Sweetener",
+      "allergen": null,
+      "explanation": "Refined sucrose for sweetness and preservation."
+    },
+    "ing_iodised_salt": {
+      "type": "Ingredient",
+      "name": "iodised salt",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Britannia 100% Whole Wheat Bread."
+    },
+    "ing_refined_wheat_flour": {
+      "type": "Ingredient",
+      "name": "refined wheat flour",
+      "category": "Grain / Cereal",
+      "allergen": "Gluten & Wheat",
+      "explanation": "Milled wheat endosperm with bran removed (Maida)."
+    },
+    "ing_preservative_282": {
+      "type": "Ingredient",
+      "name": "preservative 282",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Britannia 100% Whole Wheat Bread."
+    },
+    "ing_emulsifier_481i": {
+      "type": "Ingredient",
+      "name": "emulsifier 481i",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Britannia 100% Whole Wheat Bread."
+    },
+    "food_003": {
+      "type": "Product",
+      "name": "Nestle Everyday Dairy Whitener",
+      "brand": "Nestle",
+      "product_type": "food",
+      "category": "Dairy & Milk Products"
+    },
+    "ing_milk_solids": {
+      "type": "Ingredient",
+      "name": "milk solids",
+      "category": "Dairy Derivative",
+      "allergen": "Milk & Dairy",
+      "explanation": "Dried milk components containing lactose, casein, and whey."
+    },
+    "food_004": {
+      "type": "Product",
+      "name": "Kellogg's Real Almond & Honey Corn Flakes",
+      "brand": "Kellogg's",
+      "product_type": "food",
+      "category": "Grains & Flours"
+    },
+    "ing_corn_grits": {
+      "type": "Ingredient",
+      "name": "corn grits",
+      "category": "Grain / Cereal",
+      "allergen": null,
+      "explanation": "Coarsely ground dried yellow corn."
+    },
+    "ing_sliced_almonds": {
+      "type": "Ingredient",
+      "name": "sliced almonds",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kellogg's Real Almond & Honey Corn Flakes."
+    },
+    "ing_honey": {
+      "type": "Ingredient",
+      "name": "honey",
+      "category": "Natural Sweetener",
+      "allergen": null,
+      "explanation": "Natural nectar collected by bees containing glucose and fructose."
+    },
+    "ing_malt_extract": {
+      "type": "Ingredient",
+      "name": "malt extract",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kellogg's Real Almond & Honey Corn Flakes."
+    },
+    "ing_iodized_salt": {
+      "type": "Ingredient",
+      "name": "iodized salt",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kellogg's Real Almond & Honey Corn Flakes."
+    },
+    "ing_vitamins_&_minerals": {
+      "type": "Ingredient",
+      "name": "vitamins & minerals",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kellogg's Real Almond & Honey Corn Flakes."
+    },
+    "food_005": {
+      "type": "Product",
+      "name": "Maggi 2-Minute Masala Instant Noodles",
+      "brand": "Maggi",
+      "product_type": "food",
+      "category": "Grains & Flours"
+    },
+    "ing_refined_wheat_flour_(maida)": {
+      "type": "Ingredient",
+      "name": "refined wheat flour (maida)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Maggi 2-Minute Masala Instant Noodles."
+    },
+    "ing_palm_oil": {
+      "type": "Ingredient",
+      "name": "palm oil",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Maggi 2-Minute Masala Instant Noodles."
+    },
+    "ing_wheat_gluten": {
+      "type": "Ingredient",
+      "name": "wheat gluten",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Maggi 2-Minute Masala Instant Noodles."
+    },
+    "ing_mineral_(calcium_carbonate)": {
+      "type": "Ingredient",
+      "name": "mineral (calcium carbonate)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Maggi 2-Minute Masala Instant Noodles."
+    },
+    "ing_thickeners_(508_&_412)": {
+      "type": "Ingredient",
+      "name": "thickeners (508 & 412)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Maggi 2-Minute Masala Instant Noodles."
+    },
+    "ing_acidity_regulators_(501i_&_500i)": {
+      "type": "Ingredient",
+      "name": "acidity regulators (501i & 500i)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Maggi 2-Minute Masala Instant Noodles."
+    },
+    "ing_hydrolysed_groundnut_(peanut)_protein": {
+      "type": "Ingredient",
+      "name": "hydrolysed groundnut (peanut) protein",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Maggi 2-Minute Masala Instant Noodles."
+    },
+    "ing_mixed_spices": {
+      "type": "Ingredient",
+      "name": "mixed spices",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Maggi 2-Minute Masala Instant Noodles."
+    },
+    "ing_dehydrated_onion": {
+      "type": "Ingredient",
+      "name": "dehydrated onion",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Maggi 2-Minute Masala Instant Noodles."
+    },
+    "food_006": {
+      "type": "Product",
+      "name": "Kissan Fresh Tomato Ketchup",
+      "brand": "Kissan",
+      "product_type": "food",
+      "category": "Condiments & Sauces"
+    },
+    "ing_tomato_paste": {
+      "type": "Ingredient",
+      "name": "tomato paste",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kissan Fresh Tomato Ketchup."
+    },
+    "ing_salt": {
+      "type": "Ingredient",
+      "name": "salt",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kissan Fresh Tomato Ketchup."
+    },
+    "ing_acidity_regulator": {
+      "type": "Ingredient",
+      "name": "acidity regulator",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kissan Fresh Tomato Ketchup."
+    },
+    "ing_thickeners_(1422,_415)": {
+      "type": "Ingredient",
+      "name": "thickeners (1422, 415)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kissan Fresh Tomato Ketchup."
+    },
+    "ing_preservative": {
+      "type": "Ingredient",
+      "name": "preservative",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kissan Fresh Tomato Ketchup."
+    },
+    "ing_spices_&_condiments": {
+      "type": "Ingredient",
+      "name": "spices & condiments",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kissan Fresh Tomato Ketchup."
+    },
+    "food_007": {
+      "type": "Product",
+      "name": "Mother Dairy Classic Curd / Dahi",
+      "brand": "Mother Dairy",
+      "product_type": "food",
+      "category": "Dairy & Milk Products"
+    },
+    "ing_pasteurized_toned_milk": {
+      "type": "Ingredient",
+      "name": "pasteurized toned milk",
+      "category": "Dairy Base",
+      "allergen": "Milk & Dairy",
+      "explanation": "Heat-treated milk to eliminate pathogens while preserving calcium and protein."
+    },
+    "ing_active_lactic_culture": {
+      "type": "Ingredient",
+      "name": "active lactic culture",
+      "category": "Fermentation Agent",
+      "allergen": null,
+      "explanation": "Beneficial probiotic bacteria (Lactobacillus) used to culture curd and yogurt."
+    },
+    "food_008": {
+      "type": "Product",
+      "name": "Saffola Gold Pro Healthy Lifestyle Edible Oil",
+      "brand": "Saffola",
+      "product_type": "food",
+      "category": "Oils & Fats"
+    },
+    "ing_refined_rice_bran_oil": {
+      "type": "Ingredient",
+      "name": "refined rice bran oil",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Saffola Gold Pro Healthy Lifestyle Edible Oil."
+    },
+    "ing_refined_sunflower_oil": {
+      "type": "Ingredient",
+      "name": "refined sunflower oil",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Saffola Gold Pro Healthy Lifestyle Edible Oil."
+    },
+    "ing_antioxidants_(319,_330)": {
+      "type": "Ingredient",
+      "name": "antioxidants (319, 330)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Saffola Gold Pro Healthy Lifestyle Edible Oil."
+    },
+    "ing_anti-foaming_agent_(900a)": {
+      "type": "Ingredient",
+      "name": "anti-foaming agent (900a)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Saffola Gold Pro Healthy Lifestyle Edible Oil."
+    },
+    "food_009": {
+      "type": "Product",
+      "name": "Tata Salt Vacuum Evaporated Iodised Salt",
+      "brand": "Tata",
+      "product_type": "food",
+      "category": "Condiments & Sauces"
+    },
+    "ing_edible_common_salt": {
+      "type": "Ingredient",
+      "name": "edible common salt",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Tata Salt Vacuum Evaporated Iodised Salt."
+    },
+    "ing_potassium_iodate": {
+      "type": "Ingredient",
+      "name": "potassium iodate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Tata Salt Vacuum Evaporated Iodised Salt."
+    },
+    "ing_anticaking_agent": {
+      "type": "Ingredient",
+      "name": "anticaking agent",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Tata Salt Vacuum Evaporated Iodised Salt."
+    },
+    "food_010": {
+      "type": "Product",
+      "name": "Sunfeast Dark Fantasy Choco Fills",
+      "brand": "Sunfeast",
+      "product_type": "food",
+      "category": "Snacks & Confectionery"
+    },
+    "ing_choco_creme": {
+      "type": "Ingredient",
+      "name": "choco creme",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Sunfeast Dark Fantasy Choco Fills."
+    },
+    "ing_hydrogenated_vegetable_oil": {
+      "type": "Ingredient",
+      "name": "hydrogenated vegetable oil",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Sunfeast Dark Fantasy Choco Fills."
+    },
+    "ing_cocoa_solids": {
+      "type": "Ingredient",
+      "name": "cocoa solids",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Sunfeast Dark Fantasy Choco Fills."
+    },
+    "ing_invert_sugar_syrup": {
+      "type": "Ingredient",
+      "name": "invert sugar syrup",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Sunfeast Dark Fantasy Choco Fills."
+    },
+    "ing_raising_agents_(500ii,_503ii)": {
+      "type": "Ingredient",
+      "name": "raising agents (500ii, 503ii)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Sunfeast Dark Fantasy Choco Fills."
+    },
+    "ing_emulsifier_(soy_lecithin_322)": {
+      "type": "Ingredient",
+      "name": "emulsifier (soy lecithin 322)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Sunfeast Dark Fantasy Choco Fills."
+    },
+    "food_011": {
+      "type": "Product",
+      "name": "Lipton Pure & Light Green Tea",
+      "brand": "Lipton",
+      "product_type": "food",
+      "category": "Beverages"
+    },
+    "ing_green_tea_leaves": {
+      "type": "Ingredient",
+      "name": "green tea leaves",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Lipton Pure & Light Green Tea."
+    },
+    "food_012": {
+      "type": "Product",
+      "name": "Amul Butter Pasteurized",
+      "brand": "Amul",
+      "product_type": "food",
+      "category": "Dairy & Milk Products"
+    },
+    "ing_butter_(milk_fat_80%)": {
+      "type": "Ingredient",
+      "name": "butter (milk fat 80%)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Amul Butter Pasteurized."
+    },
+    "ing_common_salt": {
+      "type": "Ingredient",
+      "name": "common salt",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Amul Butter Pasteurized."
+    },
+    "ing_permitted_natural_color_(annatto_160b)": {
+      "type": "Ingredient",
+      "name": "permitted natural color (annatto 160b)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Amul Butter Pasteurized."
+    },
+    "food_013": {
+      "type": "Product",
+      "name": "Dabur 100% Pure Honey",
+      "brand": "Dabur",
+      "product_type": "food",
+      "category": "Condiments & Sauces"
+    },
+    "ing_pure_natural_honey": {
+      "type": "Ingredient",
+      "name": "pure natural honey",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dabur 100% Pure Honey."
+    },
+    "food_014": {
+      "type": "Product",
+      "name": "Nescafe Classic 100% Pure Instant Coffee",
+      "brand": "Nescafe",
+      "product_type": "food",
+      "category": "Beverages"
+    },
+    "ing_100%_pure_coffee_beans_(robusta_&_arabica)": {
+      "type": "Ingredient",
+      "name": "100% pure coffee beans (robusta & arabica)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Nescafe Classic 100% Pure Instant Coffee."
+    },
+    "food_015": {
+      "type": "Product",
+      "name": "Haldiram's Nagpur Roasted Salted Peanuts",
+      "brand": "Haldiram's",
+      "product_type": "food",
+      "category": "Snacks & Confectionery"
+    },
+    "ing_peanuts": {
+      "type": "Ingredient",
+      "name": "peanuts",
+      "category": "Legume / Nut",
+      "allergen": "Peanuts",
+      "explanation": "High-protein edible seed; primary cause of severe peanut allergic reactions."
+    },
+    "allergen_peanuts": {
+      "type": "Allergen",
+      "name": "Peanuts",
+      "description": "Recognized high-risk allergen trigger: Peanuts"
+    },
+    "ing_refined_peanut_oil": {
+      "type": "Ingredient",
+      "name": "refined peanut oil",
+      "category": "Edible Oil",
+      "allergen": "Peanuts",
+      "explanation": "Extracted oil from peanuts; may retain trace proteins."
+    },
+    "food_016": {
+      "type": "Product",
+      "name": "Amul Malai Paneer Fresh Cottage Cheese",
+      "brand": "Amul",
+      "product_type": "food",
+      "category": "Dairy & Milk Products"
+    },
+    "ing_citric_acid": {
+      "type": "Ingredient",
+      "name": "citric acid",
+      "category": "Acidity Regulator",
+      "allergen": null,
+      "explanation": "Natural organic acid (E330) used as a flavor enhancer and natural preservative."
+    },
+    "food_017": {
+      "type": "Product",
+      "name": "Quaker Rolled Oats 100% Whole Grain",
+      "brand": "Quaker",
+      "product_type": "food",
+      "category": "Grains & Flours"
+    },
+    "ing_100%_whole_grain_rolled_oats": {
+      "type": "Ingredient",
+      "name": "100% whole grain rolled oats",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Quaker Rolled Oats 100% Whole Grain."
+    },
+    "food_018": {
+      "type": "Product",
+      "name": "Knorr Classic Thick Tomato Soup Mix",
+      "brand": "Knorr",
+      "product_type": "food",
+      "category": "Soups & Meals"
+    },
+    "ing_tomato_paste_powder": {
+      "type": "Ingredient",
+      "name": "tomato paste powder",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Knorr Classic Thick Tomato Soup Mix."
+    },
+    "ing_edible_starch": {
+      "type": "Ingredient",
+      "name": "edible starch",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Knorr Classic Thick Tomato Soup Mix."
+    },
+    "ing_hydrolyzed_vegetable_protein_(soy)": {
+      "type": "Ingredient",
+      "name": "hydrolyzed vegetable protein (soy)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Knorr Classic Thick Tomato Soup Mix."
+    },
+    "food_019": {
+      "type": "Product",
+      "name": "Nestle Milkmaid Sweetened Condensed Milk",
+      "brand": "Nestle",
+      "product_type": "food",
+      "category": "Dairy & Milk Products"
+    },
+    "ing_milk": {
+      "type": "Ingredient",
+      "name": "milk",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Nestle Milkmaid Sweetened Condensed Milk."
+    },
+    "food_020": {
+      "type": "Product",
+      "name": "Bru Instant Coffee Chicory Mixture",
+      "brand": "Bru",
+      "product_type": "food",
+      "category": "Beverages"
+    },
+    "ing_coffee": {
+      "type": "Ingredient",
+      "name": "coffee",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Bru Instant Coffee Chicory Mixture."
+    },
+    "ing_chicory": {
+      "type": "Ingredient",
+      "name": "chicory",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Bru Instant Coffee Chicory Mixture."
+    },
+    "food_021": {
+      "type": "Product",
+      "name": "Nestle KitKat Crisp Wafer Finger",
+      "brand": "Nestle",
+      "product_type": "food",
+      "category": "Snacks & Confectionery"
+    },
+    "ing_hydrogenated_vegetable_fats": {
+      "type": "Ingredient",
+      "name": "hydrogenated vegetable fats",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Nestle KitKat Crisp Wafer Finger."
+    },
+    "ing_cocoa_butter": {
+      "type": "Ingredient",
+      "name": "cocoa butter",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Nestle KitKat Crisp Wafer Finger."
+    },
+    "ing_emulsifier_(soy_lecithin)": {
+      "type": "Ingredient",
+      "name": "emulsifier (soy lecithin)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Nestle KitKat Crisp Wafer Finger."
+    },
+    "food_022": {
+      "type": "Product",
+      "name": "Kissan Mixed Fruit Jam",
+      "brand": "Kissan",
+      "product_type": "food",
+      "category": "Condiments & Sauces"
+    },
+    "ing_mixed_fruit_pulp_(banana,_papaya,_apple,_pear,_pineapple,_mango,_grape,_orange)": {
+      "type": "Ingredient",
+      "name": "mixed fruit pulp (banana, papaya, apple, pear, pineapple, mango, grape, orange)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kissan Mixed Fruit Jam."
+    },
+    "ing_thickener": {
+      "type": "Ingredient",
+      "name": "thickener",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Kissan Mixed Fruit Jam."
+    },
+    "food_023": {
+      "type": "Product",
+      "name": "Amul Masti Spiced Buttermilk",
+      "brand": "Amul",
+      "product_type": "food",
+      "category": "Dairy & Milk Products"
+    },
+    "ing_spices_and_condiments": {
+      "type": "Ingredient",
+      "name": "spices and condiments",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Amul Masti Spiced Buttermilk."
+    },
+    "food_024": {
+      "type": "Product",
+      "name": "Nestle Cerelac Wheat Apple Baby Cereal",
+      "brand": "Nestle",
+      "product_type": "food",
+      "category": "Baby Food"
+    },
+    "ing_wheat_flour_(maida)": {
+      "type": "Ingredient",
+      "name": "wheat flour (maida)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Nestle Cerelac Wheat Apple Baby Cereal."
+    },
+    "ing_apple_juice_concentrate": {
+      "type": "Ingredient",
+      "name": "apple juice concentrate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Nestle Cerelac Wheat Apple Baby Cereal."
+    },
+    "ing_soybean_oil": {
+      "type": "Ingredient",
+      "name": "soybean oil",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Nestle Cerelac Wheat Apple Baby Cereal."
+    },
+    "ing_minerals": {
+      "type": "Ingredient",
+      "name": "minerals",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Nestle Cerelac Wheat Apple Baby Cereal."
+    },
+    "ing_vitamins": {
+      "type": "Ingredient",
+      "name": "vitamins",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Nestle Cerelac Wheat Apple Baby Cereal."
+    },
+    "food_025": {
+      "type": "Product",
+      "name": "Haldiram's All in One Spicy Namkeen",
+      "brand": "Haldiram's",
+      "product_type": "food",
+      "category": "Snacks & Confectionery"
+    },
+    "ing_chickpea_flour": {
+      "type": "Ingredient",
+      "name": "chickpea flour",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Haldiram's All in One Spicy Namkeen."
+    },
+    "ing_vegetable_oil_(cottonseed_&_palm)": {
+      "type": "Ingredient",
+      "name": "vegetable oil (cottonseed & palm)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Haldiram's All in One Spicy Namkeen."
+    },
+    "ing_puffed_rice": {
+      "type": "Ingredient",
+      "name": "puffed rice",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Haldiram's All in One Spicy Namkeen."
+    },
+    "ing_green_peas": {
+      "type": "Ingredient",
+      "name": "green peas",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Haldiram's All in One Spicy Namkeen."
+    },
+    "ing_corn_flakes": {
+      "type": "Ingredient",
+      "name": "corn flakes",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Haldiram's All in One Spicy Namkeen."
+    },
+    "ing_cashew_nuts": {
+      "type": "Ingredient",
+      "name": "cashew nuts",
+      "category": "Tree Nut",
+      "allergen": "Tree Nuts",
+      "explanation": "Kidney-shaped tree nut; potent allergen trigger."
+    },
+    "allergen_tree_nuts": {
+      "type": "Allergen",
+      "name": "Tree Nuts",
+      "description": "Recognized high-risk allergen trigger: Tree Nuts"
+    },
+    "ing_sesame_seeds": {
+      "type": "Ingredient",
+      "name": "sesame seeds",
+      "category": "Oilseed",
+      "allergen": "Sesame Seeds",
+      "explanation": "Calcium-rich oilseed and major allergen."
+    },
+    "allergen_sesame_seeds": {
+      "type": "Allergen",
+      "name": "Sesame Seeds",
+      "description": "Recognized high-risk allergen trigger: Sesame Seeds"
+    },
+    "ing_spices": {
+      "type": "Ingredient",
+      "name": "spices",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Haldiram's All in One Spicy Namkeen."
+    },
+    "med_001": {
+      "type": "Product",
+      "name": "Crocin Advance 500mg Fast Relief Tablets",
+      "brand": "GSK (GlaxoSmithKline)",
+      "product_type": "medicine",
+      "category": "Tablets & Capsules"
+    },
+    "ing_paracetamol_(acetaminophen)_500mg": {
+      "type": "Ingredient",
+      "name": "paracetamol (acetaminophen) 500mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Crocin Advance 500mg Fast Relief Tablets."
+    },
+    "ing_pregelatinized_starch": {
+      "type": "Ingredient",
+      "name": "pregelatinized starch",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Crocin Advance 500mg Fast Relief Tablets."
+    },
+    "ing_povidone_k30": {
+      "type": "Ingredient",
+      "name": "povidone k30",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Crocin Advance 500mg Fast Relief Tablets."
+    },
+    "ing_potassium_sorbate": {
+      "type": "Ingredient",
+      "name": "potassium sorbate",
+      "category": "Preservative",
+      "allergen": null,
+      "explanation": "Food and pharmaceutical antimicrobial preservative (E202)."
+    },
+    "ing_magnesium_stearate": {
+      "type": "Ingredient",
+      "name": "magnesium stearate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Crocin Advance 500mg Fast Relief Tablets."
+    },
+    "med_002": {
+      "type": "Product",
+      "name": "Augmentin 625 Duo Broad Spectrum Antibiotic",
+      "brand": "GSK",
+      "product_type": "medicine",
+      "category": "Antibiotics & Prescriptions"
+    },
+    "ing_amoxicillin_trihydrate_500mg": {
+      "type": "Ingredient",
+      "name": "amoxicillin trihydrate 500mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Augmentin 625 Duo Broad Spectrum Antibiotic."
+    },
+    "ing_potassium_clavulanate_125mg": {
+      "type": "Ingredient",
+      "name": "potassium clavulanate 125mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Augmentin 625 Duo Broad Spectrum Antibiotic."
+    },
+    "ing_microcrystalline_cellulose": {
+      "type": "Ingredient",
+      "name": "microcrystalline cellulose",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Augmentin 625 Duo Broad Spectrum Antibiotic."
+    },
+    "ing_sodium_starch_glycolate": {
+      "type": "Ingredient",
+      "name": "sodium starch glycolate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Augmentin 625 Duo Broad Spectrum Antibiotic."
+    },
+    "ing_colloidal_silicon_dioxide": {
+      "type": "Ingredient",
+      "name": "colloidal silicon dioxide",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Augmentin 625 Duo Broad Spectrum Antibiotic."
+    },
+    "med_003": {
+      "type": "Product",
+      "name": "Benadryl Cough Syrup Diphenhydramine 50ml",
+      "brand": "Johnson & Johnson",
+      "product_type": "medicine",
+      "category": "Syrups & Suspensions"
+    },
+    "ing_diphenhydramine_hydrochloride_14.08mg": {
+      "type": "Ingredient",
+      "name": "diphenhydramine hydrochloride 14.08mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Benadryl Cough Syrup Diphenhydramine 50ml."
+    },
+    "ing_ammonium_chloride_138mg": {
+      "type": "Ingredient",
+      "name": "ammonium chloride 138mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Benadryl Cough Syrup Diphenhydramine 50ml."
+    },
+    "ing_sodium_citrate_57.03mg": {
+      "type": "Ingredient",
+      "name": "sodium citrate 57.03mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Benadryl Cough Syrup Diphenhydramine 50ml."
+    },
+    "ing_menthol_0.973mg": {
+      "type": "Ingredient",
+      "name": "menthol 0.973mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Benadryl Cough Syrup Diphenhydramine 50ml."
+    },
+    "ing_sucrose": {
+      "type": "Ingredient",
+      "name": "sucrose",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Benadryl Cough Syrup Diphenhydramine 50ml."
+    },
+    "ing_glycerin": {
+      "type": "Ingredient",
+      "name": "glycerin",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Benadryl Cough Syrup Diphenhydramine 50ml."
+    },
+    "ing_sodium_benzoate": {
+      "type": "Ingredient",
+      "name": "sodium benzoate",
+      "category": "Preservative",
+      "allergen": null,
+      "explanation": "Antimicrobial food preservative active against yeasts and bacteria."
+    },
+    "med_004": {
+      "type": "Product",
+      "name": "Combiflam Analgesic & Anti-inflammatory Tablets",
+      "brand": "Sanofi",
+      "product_type": "medicine",
+      "category": "Tablets & Capsules"
+    },
+    "ing_ibuprofen_400mg": {
+      "type": "Ingredient",
+      "name": "ibuprofen 400mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Combiflam Analgesic & Anti-inflammatory Tablets."
+    },
+    "ing_paracetamol_325mg": {
+      "type": "Ingredient",
+      "name": "paracetamol 325mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Combiflam Analgesic & Anti-inflammatory Tablets."
+    },
+    "ing_maize_starch": {
+      "type": "Ingredient",
+      "name": "maize starch",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Combiflam Analgesic & Anti-inflammatory Tablets."
+    },
+    "ing_purified_talc": {
+      "type": "Ingredient",
+      "name": "purified talc",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Combiflam Analgesic & Anti-inflammatory Tablets."
+    },
+    "ing_sodium_lauryl_sulfate": {
+      "type": "Ingredient",
+      "name": "sodium lauryl sulfate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Combiflam Analgesic & Anti-inflammatory Tablets."
+    },
+    "med_005": {
+      "type": "Product",
+      "name": "Pantocid 40 Gastro-Resistant Tablets",
+      "brand": "Sun Pharma",
+      "product_type": "medicine",
+      "category": "Tablets & Capsules"
+    },
+    "ing_pantoprazole_sodium_sesquihydrate_40mg": {
+      "type": "Ingredient",
+      "name": "pantoprazole sodium sesquihydrate 40mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Pantocid 40 Gastro-Resistant Tablets."
+    },
+    "ing_sodium_carbonate": {
+      "type": "Ingredient",
+      "name": "sodium carbonate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Pantocid 40 Gastro-Resistant Tablets."
+    },
+    "ing_mannitol": {
+      "type": "Ingredient",
+      "name": "mannitol",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Pantocid 40 Gastro-Resistant Tablets."
+    },
+    "ing_crospovidone": {
+      "type": "Ingredient",
+      "name": "crospovidone",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Pantocid 40 Gastro-Resistant Tablets."
+    },
+    "ing_titanium_dioxide": {
+      "type": "Ingredient",
+      "name": "titanium dioxide",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Pantocid 40 Gastro-Resistant Tablets."
+    },
+    "med_006": {
+      "type": "Product",
+      "name": "Calpol Peediatric Suspension 120mg/5ml",
+      "brand": "GSK",
+      "product_type": "medicine",
+      "category": "Syrups & Suspensions"
+    },
+    "ing_paracetamol_120mg_per_5ml": {
+      "type": "Ingredient",
+      "name": "paracetamol 120mg per 5ml",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Calpol Peediatric Suspension 120mg/5ml."
+    },
+    "ing_sorbitol_solution": {
+      "type": "Ingredient",
+      "name": "sorbitol solution",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Calpol Peediatric Suspension 120mg/5ml."
+    },
+    "ing_glycerol": {
+      "type": "Ingredient",
+      "name": "glycerol",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Calpol Peediatric Suspension 120mg/5ml."
+    },
+    "ing_disodium_edetate": {
+      "type": "Ingredient",
+      "name": "disodium edetate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Calpol Peediatric Suspension 120mg/5ml."
+    },
+    "ing_methylparaben": {
+      "type": "Ingredient",
+      "name": "methylparaben",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Calpol Peediatric Suspension 120mg/5ml."
+    },
+    "ing_propylparaben": {
+      "type": "Ingredient",
+      "name": "propylparaben",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Calpol Peediatric Suspension 120mg/5ml."
+    },
+    "ing_strawberry_flavor": {
+      "type": "Ingredient",
+      "name": "strawberry flavor",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Calpol Peediatric Suspension 120mg/5ml."
+    },
+    "med_007": {
+      "type": "Product",
+      "name": "Ciplox 500 Ciprofloxacin Tablets",
+      "brand": "Cipla",
+      "product_type": "medicine",
+      "category": "Antibiotics & Prescriptions"
+    },
+    "ing_ciprofloxacin_hydrochloride_500mg": {
+      "type": "Ingredient",
+      "name": "ciprofloxacin hydrochloride 500mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Ciplox 500 Ciprofloxacin Tablets."
+    },
+    "ing_corn_starch": {
+      "type": "Ingredient",
+      "name": "corn starch",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Ciplox 500 Ciprofloxacin Tablets."
+    },
+    "ing_hypromellose": {
+      "type": "Ingredient",
+      "name": "hypromellose",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Ciplox 500 Ciprofloxacin Tablets."
+    },
+    "med_008": {
+      "type": "Product",
+      "name": "Moov Pain Relief Specialist Ointment 25g",
+      "brand": "Reckitt Benckiser",
+      "product_type": "medicine",
+      "category": "Topical & Ointments"
+    },
+    "ing_oil_of_wintergreen_(methyl_salicylate)_15%": {
+      "type": "Ingredient",
+      "name": "oil of wintergreen (methyl salicylate) 15%",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Moov Pain Relief Specialist Ointment 25g."
+    },
+    "ing_mint_extract_(pudina_ka_phool)_5%": {
+      "type": "Ingredient",
+      "name": "mint extract (pudina ka phool) 5%",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Moov Pain Relief Specialist Ointment 25g."
+    },
+    "ing_turpentine_oil_3%": {
+      "type": "Ingredient",
+      "name": "turpentine oil 3%",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Moov Pain Relief Specialist Ointment 25g."
+    },
+    "ing_eucalyptus_oil_2%": {
+      "type": "Ingredient",
+      "name": "eucalyptus oil 2%",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Moov Pain Relief Specialist Ointment 25g."
+    },
+    "ing_ointment_base_q.s.": {
+      "type": "Ingredient",
+      "name": "ointment base q.s.",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Moov Pain Relief Specialist Ointment 25g."
+    },
+    "med_009": {
+      "type": "Product",
+      "name": "Allegra 120mg Non-Drowsy Antihistamine",
+      "brand": "Sanofi",
+      "product_type": "medicine",
+      "category": "Tablets & Capsules"
+    },
+    "ing_fexofenadine_hydrochloride_120mg": {
+      "type": "Ingredient",
+      "name": "fexofenadine hydrochloride 120mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Allegra 120mg Non-Drowsy Antihistamine."
+    },
+    "ing_croscarmellose_sodium": {
+      "type": "Ingredient",
+      "name": "croscarmellose sodium",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Allegra 120mg Non-Drowsy Antihistamine."
+    },
+    "med_010": {
+      "type": "Product",
+      "name": "Ciplox Eye Drops 0.3% Sterile Solution",
+      "brand": "Cipla",
+      "product_type": "medicine",
+      "category": "Eye & Ear Drops"
+    },
+    "ing_ciprofloxacin_hydrochloride_0.3%_w/v": {
+      "type": "Ingredient",
+      "name": "ciprofloxacin hydrochloride 0.3% w/v",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Ciplox Eye Drops 0.3% Sterile Solution."
+    },
+    "ing_benzalkonium_chloride_0.01%_w/v_(preservative)": {
+      "type": "Ingredient",
+      "name": "benzalkonium chloride 0.01% w/v (preservative)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Ciplox Eye Drops 0.3% Sterile Solution."
+    },
+    "ing_sterile_aqueous_vehicle_q.s.": {
+      "type": "Ingredient",
+      "name": "sterile aqueous vehicle q.s.",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Ciplox Eye Drops 0.3% Sterile Solution."
+    },
+    "med_011": {
+      "type": "Product",
+      "name": "Becosules Performance Daily Multivitamin & Zinc",
+      "brand": "Pfizer",
+      "product_type": "medicine",
+      "category": "Vitamins & Supplements"
+    },
+    "ing_thiamine_(b1)_10mg": {
+      "type": "Ingredient",
+      "name": "thiamine (b1) 10mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Becosules Performance Daily Multivitamin & Zinc."
+    },
+    "ing_riboflavin_(b2)_10mg": {
+      "type": "Ingredient",
+      "name": "riboflavin (b2) 10mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Becosules Performance Daily Multivitamin & Zinc."
+    },
+    "ing_niacinamide_(b3)_50mg": {
+      "type": "Ingredient",
+      "name": "niacinamide (b3) 50mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Becosules Performance Daily Multivitamin & Zinc."
+    },
+    "ing_pyridoxine_(b6)_3mg": {
+      "type": "Ingredient",
+      "name": "pyridoxine (b6) 3mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Becosules Performance Daily Multivitamin & Zinc."
+    },
+    "ing_cyanocobalamin_(b12)_15mcg": {
+      "type": "Ingredient",
+      "name": "cyanocobalamin (b12) 15mcg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Becosules Performance Daily Multivitamin & Zinc."
+    },
+    "ing_folic_acid_1mg": {
+      "type": "Ingredient",
+      "name": "folic acid 1mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Becosules Performance Daily Multivitamin & Zinc."
+    },
+    "ing_zinc_sulphate_41.4mg": {
+      "type": "Ingredient",
+      "name": "zinc sulphate 41.4mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Becosules Performance Daily Multivitamin & Zinc."
+    },
+    "ing_vitamin_c_(vitamin_c)_150mg": {
+      "type": "Ingredient",
+      "name": "vitamin c (vitamin c) 150mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Becosules Performance Daily Multivitamin & Zinc."
+    },
+    "med_012": {
+      "type": "Product",
+      "name": "Gelusil Antacid & Anti-Gas Liquid MPS",
+      "brand": "Pfizer",
+      "product_type": "medicine",
+      "category": "Syrups & Suspensions"
+    },
+    "ing_aluminium_hydroxide_250mg": {
+      "type": "Ingredient",
+      "name": "aluminium hydroxide 250mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Gelusil Antacid & Anti-Gas Liquid MPS."
+    },
+    "ing_magnesium_hydroxide_250mg": {
+      "type": "Ingredient",
+      "name": "magnesium hydroxide 250mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Gelusil Antacid & Anti-Gas Liquid MPS."
+    },
+    "ing_activated_dimethicone_(simethicone)_50mg": {
+      "type": "Ingredient",
+      "name": "activated dimethicone (simethicone) 50mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Gelusil Antacid & Anti-Gas Liquid MPS."
+    },
+    "ing_magnesium_aluminium_silicate_50mg": {
+      "type": "Ingredient",
+      "name": "magnesium aluminium silicate 50mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Gelusil Antacid & Anti-Gas Liquid MPS."
+    },
+    "ing_sorbitol": {
+      "type": "Ingredient",
+      "name": "sorbitol",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Gelusil Antacid & Anti-Gas Liquid MPS."
+    },
+    "ing_sodium_saccharin": {
+      "type": "Ingredient",
+      "name": "sodium saccharin",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Gelusil Antacid & Anti-Gas Liquid MPS."
+    },
+    "med_013": {
+      "type": "Product",
+      "name": "Otrivin 0.1% Adult Nasal Spray Fast Relief",
+      "brand": "GSK",
+      "product_type": "medicine",
+      "category": "Nasal Sprays"
+    },
+    "ing_xylometazoline_hydrochloride_0.1%_w/v": {
+      "type": "Ingredient",
+      "name": "xylometazoline hydrochloride 0.1% w/v",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Otrivin 0.1% Adult Nasal Spray Fast Relief."
+    },
+    "ing_benzalkonium_chloride": {
+      "type": "Ingredient",
+      "name": "benzalkonium chloride",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Otrivin 0.1% Adult Nasal Spray Fast Relief."
+    },
+    "ing_sodium_chloride": {
+      "type": "Ingredient",
+      "name": "sodium chloride",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Otrivin 0.1% Adult Nasal Spray Fast Relief."
+    },
+    "ing_sodium_phosphate": {
+      "type": "Ingredient",
+      "name": "sodium phosphate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Otrivin 0.1% Adult Nasal Spray Fast Relief."
+    },
+    "med_014": {
+      "type": "Product",
+      "name": "Azithral 500 Azithromycin Tablets",
+      "brand": "Alembic",
+      "product_type": "medicine",
+      "category": "Antibiotics & Prescriptions"
+    },
+    "ing_azithromycin_dihydrate_500mg": {
+      "type": "Ingredient",
+      "name": "azithromycin dihydrate 500mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Azithral 500 Azithromycin Tablets."
+    },
+    "ing_anhydrous_calcium_phosphate": {
+      "type": "Ingredient",
+      "name": "anhydrous calcium phosphate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Azithral 500 Azithromycin Tablets."
+    },
+    "med_015": {
+      "type": "Product",
+      "name": "Asthalin 100mcg Salbutamol Inhaler (200 MDI)",
+      "brand": "Cipla",
+      "product_type": "medicine",
+      "category": "Inhalers & Respiratory"
+    },
+    "ing_salbutamol_sulphate_ip_eq_to_salbutamol_100mcg": {
+      "type": "Ingredient",
+      "name": "salbutamol sulphate ip eq to salbutamol 100mcg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Asthalin 100mcg Salbutamol Inhaler (200 MDI)."
+    },
+    "ing_hfa-134a_propellant": {
+      "type": "Ingredient",
+      "name": "hfa-134a propellant",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Asthalin 100mcg Salbutamol Inhaler (200 MDI)."
+    },
+    "med_016": {
+      "type": "Product",
+      "name": "Volini Pain Relief Gel Diclofenac Max 30g",
+      "brand": "Sun Pharma",
+      "product_type": "medicine",
+      "category": "Topical & Ointments"
+    },
+    "ing_diclofenac_diethylamine_1.16%_w/w": {
+      "type": "Ingredient",
+      "name": "diclofenac diethylamine 1.16% w/w",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Volini Pain Relief Gel Diclofenac Max 30g."
+    },
+    "ing_linseed_oil_3.0%_w/w": {
+      "type": "Ingredient",
+      "name": "linseed oil 3.0% w/w",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Volini Pain Relief Gel Diclofenac Max 30g."
+    },
+    "ing_methyl_salicylate_10.0%_w/w": {
+      "type": "Ingredient",
+      "name": "methyl salicylate 10.0% w/w",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Volini Pain Relief Gel Diclofenac Max 30g."
+    },
+    "ing_menthol_5.0%_w/w": {
+      "type": "Ingredient",
+      "name": "menthol 5.0% w/w",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Volini Pain Relief Gel Diclofenac Max 30g."
+    },
+    "ing_gel_base_q.s.": {
+      "type": "Ingredient",
+      "name": "gel base q.s.",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Volini Pain Relief Gel Diclofenac Max 30g."
+    },
+    "med_017": {
+      "type": "Product",
+      "name": "Cetirizine 10mg Non-Sedating Antihistamine",
+      "brand": "Dr. Reddy's",
+      "product_type": "medicine",
+      "category": "Tablets & Capsules"
+    },
+    "ing_cetirizine_dihydrochloride_10mg": {
+      "type": "Ingredient",
+      "name": "cetirizine dihydrochloride 10mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Cetirizine 10mg Non-Sedating Antihistamine."
+    },
+    "ing_lactose_monohydrate": {
+      "type": "Ingredient",
+      "name": "lactose monohydrate",
+      "category": "Pharmaceutical Excipient",
+      "allergen": "Milk & Dairy",
+      "explanation": "Inert tablet binder derived from milk whey."
+    },
+    "med_018": {
+      "type": "Product",
+      "name": "Dettol Antiseptic Disinfectant Liquid 250ml",
+      "brand": "Reckitt Benckiser",
+      "product_type": "medicine",
+      "category": "Topical & Ointments"
+    },
+    "ing_chloroxylenol_(pcmx)_4.8%_w/v": {
+      "type": "Ingredient",
+      "name": "chloroxylenol (pcmx) 4.8% w/v",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dettol Antiseptic Disinfectant Liquid 250ml."
+    },
+    "ing_terpineol_9.0%_v/v": {
+      "type": "Ingredient",
+      "name": "terpineol 9.0% v/v",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dettol Antiseptic Disinfectant Liquid 250ml."
+    },
+    "ing_absolute_alcohol_(denatured)_13.1%_v/v": {
+      "type": "Ingredient",
+      "name": "absolute alcohol (denatured) 13.1% v/v",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dettol Antiseptic Disinfectant Liquid 250ml."
+    },
+    "ing_caramel": {
+      "type": "Ingredient",
+      "name": "caramel",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dettol Antiseptic Disinfectant Liquid 250ml."
+    },
+    "ing_castor_oil_soap": {
+      "type": "Ingredient",
+      "name": "castor oil soap",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dettol Antiseptic Disinfectant Liquid 250ml."
+    },
+    "med_019": {
+      "type": "Product",
+      "name": "Eldoper Loperamide 2mg Anti-Diarrheal Capsules",
+      "brand": "Micro Labs",
+      "product_type": "medicine",
+      "category": "Tablets & Capsules"
+    },
+    "ing_loperamide_hydrochloride_2mg": {
+      "type": "Ingredient",
+      "name": "loperamide hydrochloride 2mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Eldoper Loperamide 2mg Anti-Diarrheal Capsules."
+    },
+    "ing_lactose": {
+      "type": "Ingredient",
+      "name": "lactose",
+      "category": "Milk Sugar / Excipient",
+      "allergen": "Milk & Dairy",
+      "explanation": "Natural milk disaccharide; commonly used as tablet filler in pharmaceuticals."
+    },
+    "ing_talc": {
+      "type": "Ingredient",
+      "name": "talc",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Eldoper Loperamide 2mg Anti-Diarrheal Capsules."
+    },
+    "med_020": {
+      "type": "Product",
+      "name": "Electral WHO Oral Rehydration Salts ORS 21.8g",
+      "brand": "FDC Limited",
+      "product_type": "medicine",
+      "category": "Syrups & Suspensions"
+    },
+    "ing_sodium_chloride_2.60g": {
+      "type": "Ingredient",
+      "name": "sodium chloride 2.60g",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Electral WHO Oral Rehydration Salts ORS 21.8g."
+    },
+    "ing_potassium_chloride_1.50g": {
+      "type": "Ingredient",
+      "name": "potassium chloride 1.50g",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Electral WHO Oral Rehydration Salts ORS 21.8g."
+    },
+    "ing_sodium_citrate_2.90g": {
+      "type": "Ingredient",
+      "name": "sodium citrate 2.90g",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Electral WHO Oral Rehydration Salts ORS 21.8g."
+    },
+    "ing_dextrose_anhydrous_13.50g": {
+      "type": "Ingredient",
+      "name": "dextrose anhydrous 13.50g",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Electral WHO Oral Rehydration Salts ORS 21.8g."
+    },
+    "med_021": {
+      "type": "Product",
+      "name": "Betadine 10% Povidone-Iodine Antiseptic Solution",
+      "brand": "Win-Medicare",
+      "product_type": "medicine",
+      "category": "Topical & Ointments"
+    },
+    "ing_povidone-iodine_ip_10%_w/v_(available_iodine_1%_w/v)": {
+      "type": "Ingredient",
+      "name": "povidone-iodine ip 10% w/v (available iodine 1% w/v)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Betadine 10% Povidone-Iodine Antiseptic Solution."
+    },
+    "ing_purified_water_q.s.": {
+      "type": "Ingredient",
+      "name": "purified water q.s.",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Betadine 10% Povidone-Iodine Antiseptic Solution."
+    },
+    "med_022": {
+      "type": "Product",
+      "name": "Avil 25mg Pheniramine Maleate Tablets",
+      "brand": "Sanofi",
+      "product_type": "medicine",
+      "category": "Tablets & Capsules"
+    },
+    "ing_pheniramine_maleate_25mg": {
+      "type": "Ingredient",
+      "name": "pheniramine maleate 25mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Avil 25mg Pheniramine Maleate Tablets."
+    },
+    "ing_starch": {
+      "type": "Ingredient",
+      "name": "starch",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Avil 25mg Pheniramine Maleate Tablets."
+    },
+    "med_023": {
+      "type": "Product",
+      "name": "Strepsils Honey & Lemon Lozenges for Sore Throat",
+      "brand": "Reckitt Benckiser",
+      "product_type": "medicine",
+      "category": "Tablets & Capsules"
+    },
+    "ing_2,4-dichlorobenzyl_alcohol_1.2mg": {
+      "type": "Ingredient",
+      "name": "2,4-dichlorobenzyl alcohol 1.2mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Strepsils Honey & Lemon Lozenges for Sore Throat."
+    },
+    "ing_amylmetacresol_0.6mg": {
+      "type": "Ingredient",
+      "name": "amylmetacresol 0.6mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Strepsils Honey & Lemon Lozenges for Sore Throat."
+    },
+    "ing_lemon_oil": {
+      "type": "Ingredient",
+      "name": "lemon oil",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Strepsils Honey & Lemon Lozenges for Sore Throat."
+    },
+    "ing_tartaric_acid": {
+      "type": "Ingredient",
+      "name": "tartaric acid",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Strepsils Honey & Lemon Lozenges for Sore Throat."
+    },
+    "ing_liquid_glucose": {
+      "type": "Ingredient",
+      "name": "liquid glucose",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Strepsils Honey & Lemon Lozenges for Sore Throat."
+    },
+    "med_024": {
+      "type": "Product",
+      "name": "Ascoril-D Plus Sugar Free Cough Syrup",
+      "brand": "Glenmark",
+      "product_type": "medicine",
+      "category": "Syrups & Suspensions"
+    },
+    "ing_dextromethorphan_hydrobromide_10mg": {
+      "type": "Ingredient",
+      "name": "dextromethorphan hydrobromide 10mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Ascoril-D Plus Sugar Free Cough Syrup."
+    },
+    "ing_phenylephrine_hydrochloride_5mg": {
+      "type": "Ingredient",
+      "name": "phenylephrine hydrochloride 5mg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Ascoril-D Plus Sugar Free Cough Syrup."
+    },
+    "ing_chlorpheniramine_maleate_2mg_per_5ml": {
+      "type": "Ingredient",
+      "name": "chlorpheniramine maleate 2mg per 5ml",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Ascoril-D Plus Sugar Free Cough Syrup."
+    },
+    "ing_sorbitol_base": {
+      "type": "Ingredient",
+      "name": "sorbitol base",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Ascoril-D Plus Sugar Free Cough Syrup."
+    },
+    "med_025": {
+      "type": "Product",
+      "name": "Thyronorm 50mcg Levothyroxine Sodium Tablets",
+      "brand": "Abbott",
+      "product_type": "medicine",
+      "category": "Tablets & Capsules"
+    },
+    "ing_levothyroxine_sodium_50mcg": {
+      "type": "Ingredient",
+      "name": "levothyroxine sodium 50mcg",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Thyronorm 50mcg Levothyroxine Sodium Tablets."
+    },
+    "ing_gelatin": {
+      "type": "Ingredient",
+      "name": "gelatin",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Thyronorm 50mcg Levothyroxine Sodium Tablets."
+    },
+    "other_001": {
+      "type": "Product",
+      "name": "Surf Excel Matic Front Load Liquid Detergent",
+      "brand": "Surf Excel",
+      "product_type": "other",
+      "category": "Household & Cleaning"
+    },
+    "ing_anionic_surfactants": {
+      "type": "Ingredient",
+      "name": "anionic surfactants",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Surf Excel Matic Front Load Liquid Detergent."
+    },
+    "ing_non-ionic_surfactants": {
+      "type": "Ingredient",
+      "name": "non-ionic surfactants",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Surf Excel Matic Front Load Liquid Detergent."
+    },
+    "ing_optical_brighteners": {
+      "type": "Ingredient",
+      "name": "optical brighteners",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Surf Excel Matic Front Load Liquid Detergent."
+    },
+    "ing_fragrance": {
+      "type": "Ingredient",
+      "name": "fragrance",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Surf Excel Matic Front Load Liquid Detergent."
+    },
+    "ing_preservatives": {
+      "type": "Ingredient",
+      "name": "preservatives",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Surf Excel Matic Front Load Liquid Detergent."
+    },
+    "other_002": {
+      "type": "Product",
+      "name": "Vim Dishwash Gel Lemon Anti-Bacterial",
+      "brand": "Vim",
+      "product_type": "other",
+      "category": "Household & Cleaning"
+    },
+    "ing_sodium_alkyl_benzene_sulphonate": {
+      "type": "Ingredient",
+      "name": "sodium alkyl benzene sulphonate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Vim Dishwash Gel Lemon Anti-Bacterial."
+    },
+    "ing_sodium_laureth_sulphate": {
+      "type": "Ingredient",
+      "name": "sodium laureth sulphate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Vim Dishwash Gel Lemon Anti-Bacterial."
+    },
+    "ing_lemon_extracts": {
+      "type": "Ingredient",
+      "name": "lemon extracts",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Vim Dishwash Gel Lemon Anti-Bacterial."
+    },
+    "other_003": {
+      "type": "Product",
+      "name": "Colgate Total 12HR Antibacterial Toothpaste",
+      "brand": "Colgate",
+      "product_type": "other",
+      "category": "Personal Care & Hygiene"
+    },
+    "ing_sodium_fluoride_(1450_ppm)": {
+      "type": "Ingredient",
+      "name": "sodium fluoride (1450 ppm)",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Colgate Total 12HR Antibacterial Toothpaste."
+    },
+    "ing_zinc_phosphate": {
+      "type": "Ingredient",
+      "name": "zinc phosphate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Colgate Total 12HR Antibacterial Toothpaste."
+    },
+    "ing_hydrated_silica": {
+      "type": "Ingredient",
+      "name": "hydrated silica",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Colgate Total 12HR Antibacterial Toothpaste."
+    },
+    "ing_flavor": {
+      "type": "Ingredient",
+      "name": "flavor",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Colgate Total 12HR Antibacterial Toothpaste."
+    },
+    "other_004": {
+      "type": "Product",
+      "name": "Dove Daily Moisture Shampoo with Nutri-Oils",
+      "brand": "Dove",
+      "product_type": "other",
+      "category": "Personal Care & Hygiene"
+    },
+    "ing_sodium_laureth_sulfate": {
+      "type": "Ingredient",
+      "name": "sodium laureth sulfate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dove Daily Moisture Shampoo with Nutri-Oils."
+    },
+    "ing_dimethiconol": {
+      "type": "Ingredient",
+      "name": "dimethiconol",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dove Daily Moisture Shampoo with Nutri-Oils."
+    },
+    "ing_cocamidopropyl_betaine": {
+      "type": "Ingredient",
+      "name": "cocamidopropyl betaine",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dove Daily Moisture Shampoo with Nutri-Oils."
+    },
+    "other_005": {
+      "type": "Product",
+      "name": "Harpic Power Plus 10X Toilet Cleaner Original",
+      "brand": "Harpic",
+      "product_type": "other",
+      "category": "Household & Cleaning"
+    },
+    "ing_hydrochloric_acid_10.5%": {
+      "type": "Ingredient",
+      "name": "hydrochloric acid 10.5%",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Harpic Power Plus 10X Toilet Cleaner Original."
+    },
+    "ing_hydroxyethyl_oleylamine": {
+      "type": "Ingredient",
+      "name": "hydroxyethyl oleylamine",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Harpic Power Plus 10X Toilet Cleaner Original."
+    },
+    "ing_cetyl_trimethyl_ammonium_chloride": {
+      "type": "Ingredient",
+      "name": "cetyl trimethyl ammonium chloride",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Harpic Power Plus 10X Toilet Cleaner Original."
+    },
+    "ing_methyl_salicylate": {
+      "type": "Ingredient",
+      "name": "methyl salicylate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Harpic Power Plus 10X Toilet Cleaner Original."
+    },
+    "ing_acid_blue_80": {
+      "type": "Ingredient",
+      "name": "acid blue 80",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Harpic Power Plus 10X Toilet Cleaner Original."
+    },
+    "other_006": {
+      "type": "Product",
+      "name": "Comfort After Wash Morning Fresh Fabric Conditioner",
+      "brand": "Comfort",
+      "product_type": "other",
+      "category": "Household & Cleaning"
+    },
+    "ing_cationic_surfactants": {
+      "type": "Ingredient",
+      "name": "cationic surfactants",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Comfort After Wash Morning Fresh Fabric Conditioner."
+    },
+    "ing_pearling_agent": {
+      "type": "Ingredient",
+      "name": "pearling agent",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Comfort After Wash Morning Fresh Fabric Conditioner."
+    },
+    "ing_silicone": {
+      "type": "Ingredient",
+      "name": "silicone",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Comfort After Wash Morning Fresh Fabric Conditioner."
+    },
+    "other_007": {
+      "type": "Product",
+      "name": "Savlon Moisture Shield Germ Protection Liquid Handwash",
+      "brand": "Savlon",
+      "product_type": "other",
+      "category": "Personal Care & Hygiene"
+    },
+    "ing_aqua": {
+      "type": "Ingredient",
+      "name": "aqua",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Savlon Moisture Shield Germ Protection Liquid Handwash."
+    },
+    "ing_glycol_distearate": {
+      "type": "Ingredient",
+      "name": "glycol distearate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Savlon Moisture Shield Germ Protection Liquid Handwash."
+    },
+    "ing_parfum": {
+      "type": "Ingredient",
+      "name": "parfum",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Savlon Moisture Shield Germ Protection Liquid Handwash."
+    },
+    "other_008": {
+      "type": "Product",
+      "name": "Dettol Original Bathing Soap Bar with Antibacterial Actives",
+      "brand": "Dettol",
+      "product_type": "other",
+      "category": "Personal Care & Hygiene"
+    },
+    "ing_sodium_palmate": {
+      "type": "Ingredient",
+      "name": "sodium palmate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dettol Original Bathing Soap Bar with Antibacterial Actives."
+    },
+    "ing_sodium_palm_kernelate": {
+      "type": "Ingredient",
+      "name": "sodium palm kernelate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dettol Original Bathing Soap Bar with Antibacterial Actives."
+    },
+    "ing_chloroxylenol": {
+      "type": "Ingredient",
+      "name": "chloroxylenol",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Dettol Original Bathing Soap Bar with Antibacterial Actives."
+    },
+    "other_009": {
+      "type": "Product",
+      "name": "Lizol Disinfectant Surface Cleaner Citrus",
+      "brand": "Lizol",
+      "product_type": "other",
+      "category": "Household & Cleaning"
+    },
+    "ing_benzalkonium_chloride_solution_4%_w/w": {
+      "type": "Ingredient",
+      "name": "benzalkonium chloride solution 4% w/w",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Lizol Disinfectant Surface Cleaner Citrus."
+    },
+    "ing_lauryl_alcohol_ethoxylate": {
+      "type": "Ingredient",
+      "name": "lauryl alcohol ethoxylate",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Lizol Disinfectant Surface Cleaner Citrus."
+    },
+    "ing_citrus_fragrance": {
+      "type": "Ingredient",
+      "name": "citrus fragrance",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Lizol Disinfectant Surface Cleaner Citrus."
+    },
+    "ing_ci_19140": {
+      "type": "Ingredient",
+      "name": "ci 19140",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Lizol Disinfectant Surface Cleaner Citrus."
+    },
+    "other_010": {
+      "type": "Product",
+      "name": "Hit Cockroach Killer Spray with Deep Reach Nozzle",
+      "brand": "Hit",
+      "product_type": "other",
+      "category": "Household & Cleaning"
+    },
+    "ing_cypermethrin_0.1%_w/w": {
+      "type": "Ingredient",
+      "name": "cypermethrin 0.1% w/w",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Hit Cockroach Killer Spray with Deep Reach Nozzle."
+    },
+    "ing_imiprothrin_0.07%_w/w": {
+      "type": "Ingredient",
+      "name": "imiprothrin 0.07% w/w",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Hit Cockroach Killer Spray with Deep Reach Nozzle."
+    },
+    "ing_lpg_propellant": {
+      "type": "Ingredient",
+      "name": "lpg propellant",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Hit Cockroach Killer Spray with Deep Reach Nozzle."
+    },
+    "ing_solvent_base": {
+      "type": "Ingredient",
+      "name": "solvent base",
+      "category": "General Food / Excipient",
+      "allergen": null,
+      "explanation": "Component used in formulation of Hit Cockroach Killer Spray with Deep Reach Nozzle."
+    }
+  },
+  "edges": [
+    {
+      "source": "food_001",
+      "target": "cat_dairy_&_milk_products",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_001",
+      "target": "ing_toned_milk",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_toned_milk",
+      "target": "allergen_milk_and_dairy",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_001",
+      "target": "ing_vitamin_a",
+      "relation": "contains"
+    },
+    {
+      "source": "food_001",
+      "target": "ing_vitamin_d",
+      "relation": "contains"
+    },
+    {
+      "source": "food_002",
+      "target": "cat_bakery_&_bread",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_002",
+      "target": "ing_whole_wheat_flour",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_whole_wheat_flour",
+      "target": "allergen_gluten_and_wheat",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_002",
+      "target": "ing_water",
+      "relation": "contains"
+    },
+    {
+      "source": "food_002",
+      "target": "ing_yeast",
+      "relation": "contains"
+    },
+    {
+      "source": "food_002",
+      "target": "ing_sugar",
+      "relation": "contains"
+    },
+    {
+      "source": "food_002",
+      "target": "ing_iodised_salt",
+      "relation": "contains"
+    },
+    {
+      "source": "food_002",
+      "target": "ing_refined_wheat_flour",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_refined_wheat_flour",
+      "target": "allergen_gluten_and_wheat",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_002",
+      "target": "ing_preservative_282",
+      "relation": "contains"
+    },
+    {
+      "source": "food_002",
+      "target": "ing_emulsifier_481i",
+      "relation": "contains"
+    },
+    {
+      "source": "food_003",
+      "target": "cat_dairy_&_milk_products",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_003",
+      "target": "ing_milk_solids",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_milk_solids",
+      "target": "allergen_milk_and_dairy",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_003",
+      "target": "ing_sugar",
+      "relation": "contains"
+    },
+    {
+      "source": "food_004",
+      "target": "cat_grains_&_flours",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_004",
+      "target": "ing_corn_grits",
+      "relation": "contains"
+    },
+    {
+      "source": "food_004",
+      "target": "ing_sugar",
+      "relation": "contains"
+    },
+    {
+      "source": "food_004",
+      "target": "ing_sliced_almonds",
+      "relation": "contains"
+    },
+    {
+      "source": "food_004",
+      "target": "ing_honey",
+      "relation": "contains"
+    },
+    {
+      "source": "food_004",
+      "target": "ing_malt_extract",
+      "relation": "contains"
+    },
+    {
+      "source": "food_004",
+      "target": "ing_iodized_salt",
+      "relation": "contains"
+    },
+    {
+      "source": "food_004",
+      "target": "ing_vitamins_&_minerals",
+      "relation": "contains"
+    },
+    {
+      "source": "food_005",
+      "target": "cat_grains_&_flours",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_005",
+      "target": "ing_refined_wheat_flour_(maida)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_005",
+      "target": "ing_palm_oil",
+      "relation": "contains"
+    },
+    {
+      "source": "food_005",
+      "target": "ing_iodised_salt",
+      "relation": "contains"
+    },
+    {
+      "source": "food_005",
+      "target": "ing_wheat_gluten",
+      "relation": "contains"
+    },
+    {
+      "source": "food_005",
+      "target": "ing_mineral_(calcium_carbonate)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_005",
+      "target": "ing_thickeners_(508_&_412)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_005",
+      "target": "ing_acidity_regulators_(501i_&_500i)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_005",
+      "target": "ing_hydrolysed_groundnut_(peanut)_protein",
+      "relation": "contains"
+    },
+    {
+      "source": "food_005",
+      "target": "ing_mixed_spices",
+      "relation": "contains"
+    },
+    {
+      "source": "food_005",
+      "target": "ing_dehydrated_onion",
+      "relation": "contains"
+    },
+    {
+      "source": "food_005",
+      "target": "ing_sugar",
+      "relation": "contains"
+    },
+    {
+      "source": "food_006",
+      "target": "cat_condiments_&_sauces",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_006",
+      "target": "ing_water",
+      "relation": "contains"
+    },
+    {
+      "source": "food_006",
+      "target": "ing_tomato_paste",
+      "relation": "contains"
+    },
+    {
+      "source": "food_006",
+      "target": "ing_sugar",
+      "relation": "contains"
+    },
+    {
+      "source": "food_006",
+      "target": "ing_salt",
+      "relation": "contains"
+    },
+    {
+      "source": "food_006",
+      "target": "ing_acidity_regulator",
+      "relation": "contains"
+    },
+    {
+      "source": "food_006",
+      "target": "ing_thickeners_(1422,_415)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_006",
+      "target": "ing_preservative",
+      "relation": "contains"
+    },
+    {
+      "source": "food_006",
+      "target": "ing_spices_&_condiments",
+      "relation": "contains"
+    },
+    {
+      "source": "food_007",
+      "target": "cat_dairy_&_milk_products",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_007",
+      "target": "ing_pasteurized_toned_milk",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_pasteurized_toned_milk",
+      "target": "allergen_milk_and_dairy",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_007",
+      "target": "ing_active_lactic_culture",
+      "relation": "contains"
+    },
+    {
+      "source": "food_008",
+      "target": "cat_oils_&_fats",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_008",
+      "target": "ing_refined_rice_bran_oil",
+      "relation": "contains"
+    },
+    {
+      "source": "food_008",
+      "target": "ing_refined_sunflower_oil",
+      "relation": "contains"
+    },
+    {
+      "source": "food_008",
+      "target": "ing_antioxidants_(319,_330)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_008",
+      "target": "ing_anti-foaming_agent_(900a)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_008",
+      "target": "ing_vitamin_a",
+      "relation": "contains"
+    },
+    {
+      "source": "food_008",
+      "target": "ing_vitamin_d",
+      "relation": "contains"
+    },
+    {
+      "source": "food_009",
+      "target": "cat_condiments_&_sauces",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_009",
+      "target": "ing_edible_common_salt",
+      "relation": "contains"
+    },
+    {
+      "source": "food_009",
+      "target": "ing_potassium_iodate",
+      "relation": "contains"
+    },
+    {
+      "source": "food_009",
+      "target": "ing_anticaking_agent",
+      "relation": "contains"
+    },
+    {
+      "source": "food_010",
+      "target": "cat_snacks_&_confectionery",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_010",
+      "target": "ing_choco_creme",
+      "relation": "contains"
+    },
+    {
+      "source": "food_010",
+      "target": "ing_refined_wheat_flour",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_refined_wheat_flour",
+      "target": "allergen_gluten_and_wheat",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_010",
+      "target": "ing_hydrogenated_vegetable_oil",
+      "relation": "contains"
+    },
+    {
+      "source": "food_010",
+      "target": "ing_sugar",
+      "relation": "contains"
+    },
+    {
+      "source": "food_010",
+      "target": "ing_cocoa_solids",
+      "relation": "contains"
+    },
+    {
+      "source": "food_010",
+      "target": "ing_invert_sugar_syrup",
+      "relation": "contains"
+    },
+    {
+      "source": "food_010",
+      "target": "ing_raising_agents_(500ii,_503ii)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_010",
+      "target": "ing_emulsifier_(soy_lecithin_322)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_011",
+      "target": "cat_beverages",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_011",
+      "target": "ing_green_tea_leaves",
+      "relation": "contains"
+    },
+    {
+      "source": "food_012",
+      "target": "cat_dairy_&_milk_products",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_012",
+      "target": "ing_butter_(milk_fat_80%)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_012",
+      "target": "ing_common_salt",
+      "relation": "contains"
+    },
+    {
+      "source": "food_012",
+      "target": "ing_permitted_natural_color_(annatto_160b)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_013",
+      "target": "cat_condiments_&_sauces",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_013",
+      "target": "ing_pure_natural_honey",
+      "relation": "contains"
+    },
+    {
+      "source": "food_014",
+      "target": "cat_beverages",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_014",
+      "target": "ing_100%_pure_coffee_beans_(robusta_&_arabica)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_015",
+      "target": "cat_snacks_&_confectionery",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_015",
+      "target": "ing_peanuts",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_peanuts",
+      "target": "allergen_peanuts",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_015",
+      "target": "ing_refined_peanut_oil",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_refined_peanut_oil",
+      "target": "allergen_peanuts",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_015",
+      "target": "ing_edible_common_salt",
+      "relation": "contains"
+    },
+    {
+      "source": "food_016",
+      "target": "cat_dairy_&_milk_products",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_016",
+      "target": "ing_milk_solids",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_milk_solids",
+      "target": "allergen_milk_and_dairy",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_016",
+      "target": "ing_citric_acid",
+      "relation": "contains"
+    },
+    {
+      "source": "food_017",
+      "target": "cat_grains_&_flours",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_017",
+      "target": "ing_100%_whole_grain_rolled_oats",
+      "relation": "contains"
+    },
+    {
+      "source": "food_018",
+      "target": "cat_soups_&_meals",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_018",
+      "target": "ing_refined_wheat_flour",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_refined_wheat_flour",
+      "target": "allergen_gluten_and_wheat",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_018",
+      "target": "ing_tomato_paste_powder",
+      "relation": "contains"
+    },
+    {
+      "source": "food_018",
+      "target": "ing_sugar",
+      "relation": "contains"
+    },
+    {
+      "source": "food_018",
+      "target": "ing_edible_starch",
+      "relation": "contains"
+    },
+    {
+      "source": "food_018",
+      "target": "ing_salt",
+      "relation": "contains"
+    },
+    {
+      "source": "food_018",
+      "target": "ing_hydrolyzed_vegetable_protein_(soy)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_018",
+      "target": "ing_spices_&_condiments",
+      "relation": "contains"
+    },
+    {
+      "source": "food_019",
+      "target": "cat_dairy_&_milk_products",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_019",
+      "target": "ing_milk",
+      "relation": "contains"
+    },
+    {
+      "source": "food_019",
+      "target": "ing_sugar",
+      "relation": "contains"
+    },
+    {
+      "source": "food_020",
+      "target": "cat_beverages",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_020",
+      "target": "ing_coffee",
+      "relation": "contains"
+    },
+    {
+      "source": "food_020",
+      "target": "ing_chicory",
+      "relation": "contains"
+    },
+    {
+      "source": "food_021",
+      "target": "cat_snacks_&_confectionery",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_021",
+      "target": "ing_sugar",
+      "relation": "contains"
+    },
+    {
+      "source": "food_021",
+      "target": "ing_milk_solids",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_milk_solids",
+      "target": "allergen_milk_and_dairy",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_021",
+      "target": "ing_refined_wheat_flour",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_refined_wheat_flour",
+      "target": "allergen_gluten_and_wheat",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_021",
+      "target": "ing_hydrogenated_vegetable_fats",
+      "relation": "contains"
+    },
+    {
+      "source": "food_021",
+      "target": "ing_cocoa_butter",
+      "relation": "contains"
+    },
+    {
+      "source": "food_021",
+      "target": "ing_cocoa_solids",
+      "relation": "contains"
+    },
+    {
+      "source": "food_021",
+      "target": "ing_emulsifier_(soy_lecithin)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_021",
+      "target": "ing_yeast",
+      "relation": "contains"
+    },
+    {
+      "source": "food_022",
+      "target": "cat_condiments_&_sauces",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_022",
+      "target": "ing_sugar",
+      "relation": "contains"
+    },
+    {
+      "source": "food_022",
+      "target": "ing_mixed_fruit_pulp_(banana,_papaya,_apple,_pear,_pineapple,_mango,_grape,_orange)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_022",
+      "target": "ing_thickener",
+      "relation": "contains"
+    },
+    {
+      "source": "food_022",
+      "target": "ing_acidity_regulator",
+      "relation": "contains"
+    },
+    {
+      "source": "food_022",
+      "target": "ing_preservative",
+      "relation": "contains"
+    },
+    {
+      "source": "food_023",
+      "target": "cat_dairy_&_milk_products",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_023",
+      "target": "ing_pasteurized_toned_milk",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_pasteurized_toned_milk",
+      "target": "allergen_milk_and_dairy",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_023",
+      "target": "ing_water",
+      "relation": "contains"
+    },
+    {
+      "source": "food_023",
+      "target": "ing_common_salt",
+      "relation": "contains"
+    },
+    {
+      "source": "food_023",
+      "target": "ing_spices_and_condiments",
+      "relation": "contains"
+    },
+    {
+      "source": "food_023",
+      "target": "ing_active_lactic_culture",
+      "relation": "contains"
+    },
+    {
+      "source": "food_024",
+      "target": "cat_baby_food",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_024",
+      "target": "ing_wheat_flour_(maida)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_024",
+      "target": "ing_milk_solids",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_milk_solids",
+      "target": "allergen_milk_and_dairy",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_024",
+      "target": "ing_apple_juice_concentrate",
+      "relation": "contains"
+    },
+    {
+      "source": "food_024",
+      "target": "ing_sugar",
+      "relation": "contains"
+    },
+    {
+      "source": "food_024",
+      "target": "ing_soybean_oil",
+      "relation": "contains"
+    },
+    {
+      "source": "food_024",
+      "target": "ing_minerals",
+      "relation": "contains"
+    },
+    {
+      "source": "food_024",
+      "target": "ing_vitamins",
+      "relation": "contains"
+    },
+    {
+      "source": "food_025",
+      "target": "cat_snacks_&_confectionery",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "food_025",
+      "target": "ing_chickpea_flour",
+      "relation": "contains"
+    },
+    {
+      "source": "food_025",
+      "target": "ing_vegetable_oil_(cottonseed_&_palm)",
+      "relation": "contains"
+    },
+    {
+      "source": "food_025",
+      "target": "ing_puffed_rice",
+      "relation": "contains"
+    },
+    {
+      "source": "food_025",
+      "target": "ing_green_peas",
+      "relation": "contains"
+    },
+    {
+      "source": "food_025",
+      "target": "ing_peanuts",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_peanuts",
+      "target": "allergen_peanuts",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_025",
+      "target": "ing_corn_flakes",
+      "relation": "contains"
+    },
+    {
+      "source": "food_025",
+      "target": "ing_cashew_nuts",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_cashew_nuts",
+      "target": "allergen_tree_nuts",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_025",
+      "target": "ing_sesame_seeds",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_sesame_seeds",
+      "target": "allergen_sesame_seeds",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "food_025",
+      "target": "ing_iodized_salt",
+      "relation": "contains"
+    },
+    {
+      "source": "food_025",
+      "target": "ing_spices",
+      "relation": "contains"
+    },
+    {
+      "source": "med_001",
+      "target": "cat_tablets_&_capsules",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_001",
+      "target": "ing_paracetamol_(acetaminophen)_500mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_001",
+      "target": "ing_pregelatinized_starch",
+      "relation": "contains"
+    },
+    {
+      "source": "med_001",
+      "target": "ing_povidone_k30",
+      "relation": "contains"
+    },
+    {
+      "source": "med_001",
+      "target": "ing_potassium_sorbate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_001",
+      "target": "ing_magnesium_stearate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_002",
+      "target": "cat_antibiotics_&_prescriptions",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_002",
+      "target": "ing_amoxicillin_trihydrate_500mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_002",
+      "target": "ing_potassium_clavulanate_125mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_002",
+      "target": "ing_microcrystalline_cellulose",
+      "relation": "contains"
+    },
+    {
+      "source": "med_002",
+      "target": "ing_sodium_starch_glycolate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_002",
+      "target": "ing_colloidal_silicon_dioxide",
+      "relation": "contains"
+    },
+    {
+      "source": "med_002",
+      "target": "ing_magnesium_stearate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_003",
+      "target": "cat_syrups_&_suspensions",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_003",
+      "target": "ing_diphenhydramine_hydrochloride_14.08mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_003",
+      "target": "ing_ammonium_chloride_138mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_003",
+      "target": "ing_sodium_citrate_57.03mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_003",
+      "target": "ing_menthol_0.973mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_003",
+      "target": "ing_sucrose",
+      "relation": "contains"
+    },
+    {
+      "source": "med_003",
+      "target": "ing_glycerin",
+      "relation": "contains"
+    },
+    {
+      "source": "med_003",
+      "target": "ing_sodium_benzoate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_004",
+      "target": "cat_tablets_&_capsules",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_004",
+      "target": "ing_ibuprofen_400mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_004",
+      "target": "ing_paracetamol_325mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_004",
+      "target": "ing_maize_starch",
+      "relation": "contains"
+    },
+    {
+      "source": "med_004",
+      "target": "ing_purified_talc",
+      "relation": "contains"
+    },
+    {
+      "source": "med_004",
+      "target": "ing_sodium_lauryl_sulfate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_005",
+      "target": "cat_tablets_&_capsules",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_005",
+      "target": "ing_pantoprazole_sodium_sesquihydrate_40mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_005",
+      "target": "ing_sodium_carbonate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_005",
+      "target": "ing_mannitol",
+      "relation": "contains"
+    },
+    {
+      "source": "med_005",
+      "target": "ing_crospovidone",
+      "relation": "contains"
+    },
+    {
+      "source": "med_005",
+      "target": "ing_titanium_dioxide",
+      "relation": "contains"
+    },
+    {
+      "source": "med_006",
+      "target": "cat_syrups_&_suspensions",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_006",
+      "target": "ing_paracetamol_120mg_per_5ml",
+      "relation": "contains"
+    },
+    {
+      "source": "med_006",
+      "target": "ing_sorbitol_solution",
+      "relation": "contains"
+    },
+    {
+      "source": "med_006",
+      "target": "ing_glycerol",
+      "relation": "contains"
+    },
+    {
+      "source": "med_006",
+      "target": "ing_disodium_edetate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_006",
+      "target": "ing_methylparaben",
+      "relation": "contains"
+    },
+    {
+      "source": "med_006",
+      "target": "ing_propylparaben",
+      "relation": "contains"
+    },
+    {
+      "source": "med_006",
+      "target": "ing_strawberry_flavor",
+      "relation": "contains"
+    },
+    {
+      "source": "med_007",
+      "target": "cat_antibiotics_&_prescriptions",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_007",
+      "target": "ing_ciprofloxacin_hydrochloride_500mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_007",
+      "target": "ing_microcrystalline_cellulose",
+      "relation": "contains"
+    },
+    {
+      "source": "med_007",
+      "target": "ing_corn_starch",
+      "relation": "contains"
+    },
+    {
+      "source": "med_007",
+      "target": "ing_magnesium_stearate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_007",
+      "target": "ing_hypromellose",
+      "relation": "contains"
+    },
+    {
+      "source": "med_008",
+      "target": "cat_topical_&_ointments",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_008",
+      "target": "ing_oil_of_wintergreen_(methyl_salicylate)_15%",
+      "relation": "contains"
+    },
+    {
+      "source": "med_008",
+      "target": "ing_mint_extract_(pudina_ka_phool)_5%",
+      "relation": "contains"
+    },
+    {
+      "source": "med_008",
+      "target": "ing_turpentine_oil_3%",
+      "relation": "contains"
+    },
+    {
+      "source": "med_008",
+      "target": "ing_eucalyptus_oil_2%",
+      "relation": "contains"
+    },
+    {
+      "source": "med_008",
+      "target": "ing_ointment_base_q.s.",
+      "relation": "contains"
+    },
+    {
+      "source": "med_009",
+      "target": "cat_tablets_&_capsules",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_009",
+      "target": "ing_fexofenadine_hydrochloride_120mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_009",
+      "target": "ing_pregelatinized_starch",
+      "relation": "contains"
+    },
+    {
+      "source": "med_009",
+      "target": "ing_microcrystalline_cellulose",
+      "relation": "contains"
+    },
+    {
+      "source": "med_009",
+      "target": "ing_croscarmellose_sodium",
+      "relation": "contains"
+    },
+    {
+      "source": "med_009",
+      "target": "ing_magnesium_stearate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_010",
+      "target": "cat_eye_&_ear_drops",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_010",
+      "target": "ing_ciprofloxacin_hydrochloride_0.3%_w/v",
+      "relation": "contains"
+    },
+    {
+      "source": "med_010",
+      "target": "ing_benzalkonium_chloride_0.01%_w/v_(preservative)",
+      "relation": "contains"
+    },
+    {
+      "source": "med_010",
+      "target": "ing_sterile_aqueous_vehicle_q.s.",
+      "relation": "contains"
+    },
+    {
+      "source": "med_011",
+      "target": "cat_vitamins_&_supplements",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_011",
+      "target": "ing_thiamine_(b1)_10mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_011",
+      "target": "ing_riboflavin_(b2)_10mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_011",
+      "target": "ing_niacinamide_(b3)_50mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_011",
+      "target": "ing_pyridoxine_(b6)_3mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_011",
+      "target": "ing_cyanocobalamin_(b12)_15mcg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_011",
+      "target": "ing_folic_acid_1mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_011",
+      "target": "ing_zinc_sulphate_41.4mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_011",
+      "target": "ing_vitamin_c_(vitamin_c)_150mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_012",
+      "target": "cat_syrups_&_suspensions",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_012",
+      "target": "ing_aluminium_hydroxide_250mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_012",
+      "target": "ing_magnesium_hydroxide_250mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_012",
+      "target": "ing_activated_dimethicone_(simethicone)_50mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_012",
+      "target": "ing_magnesium_aluminium_silicate_50mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_012",
+      "target": "ing_sorbitol",
+      "relation": "contains"
+    },
+    {
+      "source": "med_012",
+      "target": "ing_sodium_saccharin",
+      "relation": "contains"
+    },
+    {
+      "source": "med_013",
+      "target": "cat_nasal_sprays",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_013",
+      "target": "ing_xylometazoline_hydrochloride_0.1%_w/v",
+      "relation": "contains"
+    },
+    {
+      "source": "med_013",
+      "target": "ing_benzalkonium_chloride",
+      "relation": "contains"
+    },
+    {
+      "source": "med_013",
+      "target": "ing_disodium_edetate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_013",
+      "target": "ing_sodium_chloride",
+      "relation": "contains"
+    },
+    {
+      "source": "med_013",
+      "target": "ing_sodium_phosphate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_014",
+      "target": "cat_antibiotics_&_prescriptions",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_014",
+      "target": "ing_azithromycin_dihydrate_500mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_014",
+      "target": "ing_anhydrous_calcium_phosphate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_014",
+      "target": "ing_pregelatinized_starch",
+      "relation": "contains"
+    },
+    {
+      "source": "med_014",
+      "target": "ing_croscarmellose_sodium",
+      "relation": "contains"
+    },
+    {
+      "source": "med_014",
+      "target": "ing_magnesium_stearate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_015",
+      "target": "cat_inhalers_&_respiratory",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_015",
+      "target": "ing_salbutamol_sulphate_ip_eq_to_salbutamol_100mcg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_015",
+      "target": "ing_hfa-134a_propellant",
+      "relation": "contains"
+    },
+    {
+      "source": "med_016",
+      "target": "cat_topical_&_ointments",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_016",
+      "target": "ing_diclofenac_diethylamine_1.16%_w/w",
+      "relation": "contains"
+    },
+    {
+      "source": "med_016",
+      "target": "ing_linseed_oil_3.0%_w/w",
+      "relation": "contains"
+    },
+    {
+      "source": "med_016",
+      "target": "ing_methyl_salicylate_10.0%_w/w",
+      "relation": "contains"
+    },
+    {
+      "source": "med_016",
+      "target": "ing_menthol_5.0%_w/w",
+      "relation": "contains"
+    },
+    {
+      "source": "med_016",
+      "target": "ing_gel_base_q.s.",
+      "relation": "contains"
+    },
+    {
+      "source": "med_017",
+      "target": "cat_tablets_&_capsules",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_017",
+      "target": "ing_cetirizine_dihydrochloride_10mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_017",
+      "target": "ing_lactose_monohydrate",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_lactose_monohydrate",
+      "target": "allergen_milk_and_dairy",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "med_017",
+      "target": "ing_microcrystalline_cellulose",
+      "relation": "contains"
+    },
+    {
+      "source": "med_017",
+      "target": "ing_colloidal_silicon_dioxide",
+      "relation": "contains"
+    },
+    {
+      "source": "med_017",
+      "target": "ing_magnesium_stearate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_018",
+      "target": "cat_topical_&_ointments",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_018",
+      "target": "ing_chloroxylenol_(pcmx)_4.8%_w/v",
+      "relation": "contains"
+    },
+    {
+      "source": "med_018",
+      "target": "ing_terpineol_9.0%_v/v",
+      "relation": "contains"
+    },
+    {
+      "source": "med_018",
+      "target": "ing_absolute_alcohol_(denatured)_13.1%_v/v",
+      "relation": "contains"
+    },
+    {
+      "source": "med_018",
+      "target": "ing_caramel",
+      "relation": "contains"
+    },
+    {
+      "source": "med_018",
+      "target": "ing_castor_oil_soap",
+      "relation": "contains"
+    },
+    {
+      "source": "med_019",
+      "target": "cat_tablets_&_capsules",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_019",
+      "target": "ing_loperamide_hydrochloride_2mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_019",
+      "target": "ing_lactose",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_lactose",
+      "target": "allergen_milk_and_dairy",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "med_019",
+      "target": "ing_corn_starch",
+      "relation": "contains"
+    },
+    {
+      "source": "med_019",
+      "target": "ing_talc",
+      "relation": "contains"
+    },
+    {
+      "source": "med_019",
+      "target": "ing_magnesium_stearate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_020",
+      "target": "cat_syrups_&_suspensions",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_020",
+      "target": "ing_sodium_chloride_2.60g",
+      "relation": "contains"
+    },
+    {
+      "source": "med_020",
+      "target": "ing_potassium_chloride_1.50g",
+      "relation": "contains"
+    },
+    {
+      "source": "med_020",
+      "target": "ing_sodium_citrate_2.90g",
+      "relation": "contains"
+    },
+    {
+      "source": "med_020",
+      "target": "ing_dextrose_anhydrous_13.50g",
+      "relation": "contains"
+    },
+    {
+      "source": "med_021",
+      "target": "cat_topical_&_ointments",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_021",
+      "target": "ing_povidone-iodine_ip_10%_w/v_(available_iodine_1%_w/v)",
+      "relation": "contains"
+    },
+    {
+      "source": "med_021",
+      "target": "ing_purified_water_q.s.",
+      "relation": "contains"
+    },
+    {
+      "source": "med_022",
+      "target": "cat_tablets_&_capsules",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_022",
+      "target": "ing_pheniramine_maleate_25mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_022",
+      "target": "ing_lactose",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_lactose",
+      "target": "allergen_milk_and_dairy",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "med_022",
+      "target": "ing_starch",
+      "relation": "contains"
+    },
+    {
+      "source": "med_022",
+      "target": "ing_talc",
+      "relation": "contains"
+    },
+    {
+      "source": "med_023",
+      "target": "cat_tablets_&_capsules",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_023",
+      "target": "ing_2,4-dichlorobenzyl_alcohol_1.2mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_023",
+      "target": "ing_amylmetacresol_0.6mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_023",
+      "target": "ing_honey",
+      "relation": "contains"
+    },
+    {
+      "source": "med_023",
+      "target": "ing_lemon_oil",
+      "relation": "contains"
+    },
+    {
+      "source": "med_023",
+      "target": "ing_tartaric_acid",
+      "relation": "contains"
+    },
+    {
+      "source": "med_023",
+      "target": "ing_sucrose",
+      "relation": "contains"
+    },
+    {
+      "source": "med_023",
+      "target": "ing_liquid_glucose",
+      "relation": "contains"
+    },
+    {
+      "source": "med_024",
+      "target": "cat_syrups_&_suspensions",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_024",
+      "target": "ing_dextromethorphan_hydrobromide_10mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_024",
+      "target": "ing_phenylephrine_hydrochloride_5mg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_024",
+      "target": "ing_chlorpheniramine_maleate_2mg_per_5ml",
+      "relation": "contains"
+    },
+    {
+      "source": "med_024",
+      "target": "ing_sorbitol_base",
+      "relation": "contains"
+    },
+    {
+      "source": "med_024",
+      "target": "ing_sodium_benzoate",
+      "relation": "contains"
+    },
+    {
+      "source": "med_025",
+      "target": "cat_tablets_&_capsules",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "med_025",
+      "target": "ing_levothyroxine_sodium_50mcg",
+      "relation": "contains"
+    },
+    {
+      "source": "med_025",
+      "target": "ing_lactose_monohydrate",
+      "relation": "contains"
+    },
+    {
+      "source": "ing_lactose_monohydrate",
+      "target": "allergen_milk_and_dairy",
+      "relation": "may_trigger"
+    },
+    {
+      "source": "med_025",
+      "target": "ing_corn_starch",
+      "relation": "contains"
+    },
+    {
+      "source": "med_025",
+      "target": "ing_gelatin",
+      "relation": "contains"
+    },
+    {
+      "source": "med_025",
+      "target": "ing_magnesium_stearate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_001",
+      "target": "cat_household_&_cleaning",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "other_001",
+      "target": "ing_anionic_surfactants",
+      "relation": "contains"
+    },
+    {
+      "source": "other_001",
+      "target": "ing_non-ionic_surfactants",
+      "relation": "contains"
+    },
+    {
+      "source": "other_001",
+      "target": "ing_optical_brighteners",
+      "relation": "contains"
+    },
+    {
+      "source": "other_001",
+      "target": "ing_fragrance",
+      "relation": "contains"
+    },
+    {
+      "source": "other_001",
+      "target": "ing_preservatives",
+      "relation": "contains"
+    },
+    {
+      "source": "other_002",
+      "target": "cat_household_&_cleaning",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "other_002",
+      "target": "ing_sodium_alkyl_benzene_sulphonate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_002",
+      "target": "ing_sodium_laureth_sulphate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_002",
+      "target": "ing_lemon_extracts",
+      "relation": "contains"
+    },
+    {
+      "source": "other_002",
+      "target": "ing_preservative",
+      "relation": "contains"
+    },
+    {
+      "source": "other_003",
+      "target": "cat_personal_care_&_hygiene",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "other_003",
+      "target": "ing_sodium_fluoride_(1450_ppm)",
+      "relation": "contains"
+    },
+    {
+      "source": "other_003",
+      "target": "ing_zinc_phosphate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_003",
+      "target": "ing_hydrated_silica",
+      "relation": "contains"
+    },
+    {
+      "source": "other_003",
+      "target": "ing_sorbitol",
+      "relation": "contains"
+    },
+    {
+      "source": "other_003",
+      "target": "ing_glycerin",
+      "relation": "contains"
+    },
+    {
+      "source": "other_003",
+      "target": "ing_sodium_lauryl_sulfate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_003",
+      "target": "ing_flavor",
+      "relation": "contains"
+    },
+    {
+      "source": "other_004",
+      "target": "cat_personal_care_&_hygiene",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "other_004",
+      "target": "ing_water",
+      "relation": "contains"
+    },
+    {
+      "source": "other_004",
+      "target": "ing_sodium_laureth_sulfate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_004",
+      "target": "ing_dimethiconol",
+      "relation": "contains"
+    },
+    {
+      "source": "other_004",
+      "target": "ing_cocamidopropyl_betaine",
+      "relation": "contains"
+    },
+    {
+      "source": "other_004",
+      "target": "ing_fragrance",
+      "relation": "contains"
+    },
+    {
+      "source": "other_004",
+      "target": "ing_citric_acid",
+      "relation": "contains"
+    },
+    {
+      "source": "other_005",
+      "target": "cat_household_&_cleaning",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "other_005",
+      "target": "ing_hydrochloric_acid_10.5%",
+      "relation": "contains"
+    },
+    {
+      "source": "other_005",
+      "target": "ing_hydroxyethyl_oleylamine",
+      "relation": "contains"
+    },
+    {
+      "source": "other_005",
+      "target": "ing_cetyl_trimethyl_ammonium_chloride",
+      "relation": "contains"
+    },
+    {
+      "source": "other_005",
+      "target": "ing_methyl_salicylate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_005",
+      "target": "ing_acid_blue_80",
+      "relation": "contains"
+    },
+    {
+      "source": "other_006",
+      "target": "cat_household_&_cleaning",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "other_006",
+      "target": "ing_cationic_surfactants",
+      "relation": "contains"
+    },
+    {
+      "source": "other_006",
+      "target": "ing_fragrance",
+      "relation": "contains"
+    },
+    {
+      "source": "other_006",
+      "target": "ing_pearling_agent",
+      "relation": "contains"
+    },
+    {
+      "source": "other_006",
+      "target": "ing_silicone",
+      "relation": "contains"
+    },
+    {
+      "source": "other_006",
+      "target": "ing_preservative",
+      "relation": "contains"
+    },
+    {
+      "source": "other_007",
+      "target": "cat_personal_care_&_hygiene",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "other_007",
+      "target": "ing_aqua",
+      "relation": "contains"
+    },
+    {
+      "source": "other_007",
+      "target": "ing_sodium_laureth_sulfate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_007",
+      "target": "ing_cocamidopropyl_betaine",
+      "relation": "contains"
+    },
+    {
+      "source": "other_007",
+      "target": "ing_glycol_distearate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_007",
+      "target": "ing_benzalkonium_chloride",
+      "relation": "contains"
+    },
+    {
+      "source": "other_007",
+      "target": "ing_parfum",
+      "relation": "contains"
+    },
+    {
+      "source": "other_008",
+      "target": "cat_personal_care_&_hygiene",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "other_008",
+      "target": "ing_sodium_palmate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_008",
+      "target": "ing_sodium_palm_kernelate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_008",
+      "target": "ing_aqua",
+      "relation": "contains"
+    },
+    {
+      "source": "other_008",
+      "target": "ing_parfum",
+      "relation": "contains"
+    },
+    {
+      "source": "other_008",
+      "target": "ing_chloroxylenol",
+      "relation": "contains"
+    },
+    {
+      "source": "other_008",
+      "target": "ing_glycerin",
+      "relation": "contains"
+    },
+    {
+      "source": "other_008",
+      "target": "ing_titanium_dioxide",
+      "relation": "contains"
+    },
+    {
+      "source": "other_009",
+      "target": "cat_household_&_cleaning",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "other_009",
+      "target": "ing_benzalkonium_chloride_solution_4%_w/w",
+      "relation": "contains"
+    },
+    {
+      "source": "other_009",
+      "target": "ing_aqua",
+      "relation": "contains"
+    },
+    {
+      "source": "other_009",
+      "target": "ing_lauryl_alcohol_ethoxylate",
+      "relation": "contains"
+    },
+    {
+      "source": "other_009",
+      "target": "ing_citrus_fragrance",
+      "relation": "contains"
+    },
+    {
+      "source": "other_009",
+      "target": "ing_ci_19140",
+      "relation": "contains"
+    },
+    {
+      "source": "other_010",
+      "target": "cat_household_&_cleaning",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "other_010",
+      "target": "ing_cypermethrin_0.1%_w/w",
+      "relation": "contains"
+    },
+    {
+      "source": "other_010",
+      "target": "ing_imiprothrin_0.07%_w/w",
+      "relation": "contains"
+    },
+    {
+      "source": "other_010",
+      "target": "ing_lpg_propellant",
+      "relation": "contains"
+    },
+    {
+      "source": "other_010",
+      "target": "ing_solvent_base",
+      "relation": "contains"
+    }
+  ]
+}

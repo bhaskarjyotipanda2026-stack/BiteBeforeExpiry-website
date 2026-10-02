@@ -1,0 +1,512 @@
+[
+  {
+    "id": "food_001",
+    "barcode": "8901262010015",
+    "product_name": "Amul Taaza Homogenised Toned Milk",
+    "brand": "Amul",
+    "category": "Dairy & Milk Products",
+    "product_type": "food",
+    "ingredients": [
+      "Toned Milk",
+      "Vitamin A",
+      "Vitamin D"
+    ],
+    "allergens": [
+      "Milk & Dairy"
+    ],
+    "shelf_life_days": 180,
+    "storage": "refrigerated_after_opening",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_002",
+    "barcode": "8901030005012",
+    "product_name": "Britannia 100% Whole Wheat Bread",
+    "brand": "Britannia",
+    "category": "Bakery & Bread",
+    "product_type": "food",
+    "ingredients": [
+      "Whole Wheat Flour",
+      "Water",
+      "Yeast",
+      "Sugar",
+      "Iodised Salt",
+      "Refined Wheat Flour",
+      "Preservative 282",
+      "Emulsifier 481i"
+    ],
+    "allergens": [
+      "Gluten & Wheat"
+    ],
+    "shelf_life_days": 6,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_003",
+    "barcode": "8901725181123",
+    "product_name": "Nestle Everyday Dairy Whitener",
+    "brand": "Nestle",
+    "category": "Dairy & Milk Products",
+    "product_type": "food",
+    "ingredients": [
+      "Milk Solids",
+      "Sugar"
+    ],
+    "allergens": [
+      "Milk & Dairy"
+    ],
+    "shelf_life_days": 365,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_004",
+    "barcode": "8901499008812",
+    "product_name": "Kellogg's Real Almond & Honey Corn Flakes",
+    "brand": "Kellogg's",
+    "category": "Grains & Flours",
+    "product_type": "food",
+    "ingredients": [
+      "Corn Grits",
+      "Sugar",
+      "Sliced Almonds",
+      "Honey",
+      "Malt Extract",
+      "Iodized Salt",
+      "Vitamins & Minerals"
+    ],
+    "allergens": [
+      "Tree Nuts",
+      "Gluten & Wheat"
+    ],
+    "shelf_life_days": 270,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_005",
+    "barcode": "8901058852331",
+    "product_name": "Maggi 2-Minute Masala Instant Noodles",
+    "brand": "Maggi",
+    "category": "Grains & Flours",
+    "product_type": "food",
+    "ingredients": [
+      "Refined Wheat Flour (Maida)",
+      "Palm Oil",
+      "Iodised Salt",
+      "Wheat Gluten",
+      "Mineral (Calcium Carbonate)",
+      "Thickeners (508 & 412)",
+      "Acidity Regulators (501i & 500i)",
+      "Hydrolysed Groundnut (Peanut) Protein",
+      "Mixed Spices",
+      "Dehydrated Onion",
+      "Sugar"
+    ],
+    "allergens": [
+      "Gluten & Wheat",
+      "Peanuts"
+    ],
+    "shelf_life_days": 270,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_006",
+    "barcode": "8901030383783",
+    "product_name": "Kissan Fresh Tomato Ketchup",
+    "brand": "Kissan",
+    "category": "Condiments & Sauces",
+    "product_type": "food",
+    "ingredients": [
+      "Water",
+      "Tomato Paste (26%)",
+      "Sugar",
+      "Salt",
+      "Acidity Regulator (260)",
+      "Thickeners (1422, 415)",
+      "Preservative (211)",
+      "Spices & Condiments"
+    ],
+    "allergens": [],
+    "shelf_life_days": 365,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_007",
+    "barcode": "8901063141121",
+    "product_name": "Mother Dairy Classic Curd / Dahi",
+    "brand": "Mother Dairy",
+    "category": "Dairy & Milk Products",
+    "product_type": "food",
+    "ingredients": [
+      "Pasteurized Toned Milk",
+      "Active Lactic Culture"
+    ],
+    "allergens": [
+      "Milk & Dairy"
+    ],
+    "shelf_life_days": 15,
+    "storage": "fridge",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_008",
+    "barcode": "8906007280145",
+    "product_name": "Saffola Gold Pro Healthy Lifestyle Edible Oil",
+    "brand": "Saffola",
+    "category": "Oils & Fats",
+    "product_type": "food",
+    "ingredients": [
+      "Refined Rice Bran Oil (80%)",
+      "Refined Sunflower Oil (20%)",
+      "Antioxidants (319, 330)",
+      "Anti-foaming Agent (900a)",
+      "Vitamin A",
+      "Vitamin D"
+    ],
+    "allergens": [],
+    "shelf_life_days": 270,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_009",
+    "barcode": "8901396115013",
+    "product_name": "Tata Salt Vacuum Evaporated Iodised Salt",
+    "brand": "Tata",
+    "category": "Condiments & Sauces",
+    "product_type": "food",
+    "ingredients": [
+      "Edible Common Salt",
+      "Potassium Iodate",
+      "Anticaking Agent (551)"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_010",
+    "barcode": "8901719114144",
+    "product_name": "Sunfeast Dark Fantasy Choco Fills",
+    "brand": "Sunfeast",
+    "category": "Snacks & Confectionery",
+    "product_type": "food",
+    "ingredients": [
+      "Choco Creme",
+      "Refined Wheat Flour",
+      "Hydrogenated Vegetable Oil",
+      "Sugar",
+      "Cocoa Solids",
+      "Invert Sugar Syrup",
+      "Raising Agents (500ii, 503ii)",
+      "Emulsifier (Soy Lecithin 322)"
+    ],
+    "allergens": [
+      "Gluten & Wheat",
+      "Soy"
+    ],
+    "shelf_life_days": 180,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_011",
+    "barcode": "8901030012010",
+    "product_name": "Lipton Pure & Light Green Tea",
+    "brand": "Lipton",
+    "category": "Beverages",
+    "product_type": "food",
+    "ingredients": [
+      "Green Tea Leaves"
+    ],
+    "allergens": [],
+    "shelf_life_days": 365,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_012",
+    "barcode": "8901063011400",
+    "product_name": "Amul Butter Pasteurized",
+    "brand": "Amul",
+    "category": "Dairy & Milk Products",
+    "product_type": "food",
+    "ingredients": [
+      "Butter (Milk Fat 80%)",
+      "Common Salt",
+      "Permitted Natural Color (Annatto 160b)"
+    ],
+    "allergens": [
+      "Milk & Dairy"
+    ],
+    "shelf_life_days": 365,
+    "storage": "fridge",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_013",
+    "barcode": "8901491101900",
+    "product_name": "Dabur 100% Pure Honey",
+    "brand": "Dabur",
+    "category": "Condiments & Sauces",
+    "product_type": "food",
+    "ingredients": [
+      "Pure Natural Honey"
+    ],
+    "allergens": [],
+    "shelf_life_days": 540,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_014",
+    "barcode": "8901725134111",
+    "product_name": "Nescafe Classic 100% Pure Instant Coffee",
+    "brand": "Nescafe",
+    "category": "Beverages",
+    "product_type": "food",
+    "ingredients": [
+      "100% Pure Coffee Beans (Robusta & Arabica)"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_015",
+    "barcode": "8902080001019",
+    "product_name": "Haldiram's Nagpur Roasted Salted Peanuts",
+    "brand": "Haldiram's",
+    "category": "Snacks & Confectionery",
+    "product_type": "food",
+    "ingredients": [
+      "Peanuts (96%)",
+      "Refined Peanut Oil",
+      "Edible Common Salt"
+    ],
+    "allergens": [
+      "Peanuts"
+    ],
+    "shelf_life_days": 180,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_016",
+    "barcode": "8901063155012",
+    "product_name": "Amul Malai Paneer Fresh Cottage Cheese",
+    "brand": "Amul",
+    "category": "Dairy & Milk Products",
+    "product_type": "food",
+    "ingredients": [
+      "Milk Solids",
+      "Citric Acid"
+    ],
+    "allergens": [
+      "Milk & Dairy"
+    ],
+    "shelf_life_days": 45,
+    "storage": "fridge",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_017",
+    "barcode": "8901499010020",
+    "product_name": "Quaker Rolled Oats 100% Whole Grain",
+    "brand": "Quaker",
+    "category": "Grains & Flours",
+    "product_type": "food",
+    "ingredients": [
+      "100% Whole Grain Rolled Oats"
+    ],
+    "allergens": [
+      "Gluten & Wheat"
+    ],
+    "shelf_life_days": 365,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_018",
+    "barcode": "8901030581028",
+    "product_name": "Knorr Classic Thick Tomato Soup Mix",
+    "brand": "Knorr",
+    "category": "Soups & Meals",
+    "product_type": "food",
+    "ingredients": [
+      "Refined Wheat Flour",
+      "Tomato Paste Powder",
+      "Sugar",
+      "Edible Starch",
+      "Salt",
+      "Hydrolyzed Vegetable Protein (Soy)",
+      "Spices & Condiments"
+    ],
+    "allergens": [
+      "Gluten & Wheat",
+      "Soy"
+    ],
+    "shelf_life_days": 365,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_019",
+    "barcode": "8901058860015",
+    "product_name": "Nestle Milkmaid Sweetened Condensed Milk",
+    "brand": "Nestle",
+    "category": "Dairy & Milk Products",
+    "product_type": "food",
+    "ingredients": [
+      "Milk",
+      "Sugar"
+    ],
+    "allergens": [
+      "Milk & Dairy"
+    ],
+    "shelf_life_days": 270,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_020",
+    "barcode": "8901030025119",
+    "product_name": "Bru Instant Coffee Chicory Mixture",
+    "brand": "Bru",
+    "category": "Beverages",
+    "product_type": "food",
+    "ingredients": [
+      "Coffee (70%)",
+      "Chicory (30%)"
+    ],
+    "allergens": [],
+    "shelf_life_days": 540,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_021",
+    "barcode": "8901725114120",
+    "product_name": "Nestle KitKat Crisp Wafer Finger",
+    "brand": "Nestle",
+    "category": "Snacks & Confectionery",
+    "product_type": "food",
+    "ingredients": [
+      "Sugar",
+      "Milk Solids",
+      "Refined Wheat Flour",
+      "Hydrogenated Vegetable Fats",
+      "Cocoa Butter",
+      "Cocoa Solids (4.5%)",
+      "Emulsifier (Soy Lecithin)",
+      "Yeast"
+    ],
+    "allergens": [
+      "Milk & Dairy",
+      "Gluten & Wheat",
+      "Soy"
+    ],
+    "shelf_life_days": 270,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_022",
+    "barcode": "8901030382212",
+    "product_name": "Kissan Mixed Fruit Jam",
+    "brand": "Kissan",
+    "category": "Condiments & Sauces",
+    "product_type": "food",
+    "ingredients": [
+      "Sugar",
+      "Mixed Fruit Pulp (46%) (Banana, Papaya, Apple, Pear, Pineapple, Mango, Grape, Orange)",
+      "Thickener (440)",
+      "Acidity Regulator (330)",
+      "Preservative (211)"
+    ],
+    "allergens": [],
+    "shelf_life_days": 365,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_023",
+    "barcode": "8901063162010",
+    "product_name": "Amul Masti Spiced Buttermilk",
+    "brand": "Amul",
+    "category": "Dairy & Milk Products",
+    "product_type": "food",
+    "ingredients": [
+      "Pasteurized Toned Milk",
+      "Water",
+      "Common Salt",
+      "Spices and Condiments",
+      "Active Lactic Culture"
+    ],
+    "allergens": [
+      "Milk & Dairy"
+    ],
+    "shelf_life_days": 180,
+    "storage": "fridge",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_024",
+    "barcode": "8901058869117",
+    "product_name": "Nestle Cerelac Wheat Apple Baby Cereal",
+    "brand": "Nestle",
+    "category": "Baby Food",
+    "product_type": "food",
+    "ingredients": [
+      "Wheat Flour (Maida)",
+      "Milk Solids",
+      "Apple Juice Concentrate",
+      "Sugar",
+      "Soybean Oil",
+      "Minerals",
+      "Vitamins"
+    ],
+    "allergens": [
+      "Gluten & Wheat",
+      "Milk & Dairy",
+      "Soy"
+    ],
+    "shelf_life_days": 365,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  },
+  {
+    "id": "food_025",
+    "barcode": "8902080004126",
+    "product_name": "Haldiram's All in One Spicy Namkeen",
+    "brand": "Haldiram's",
+    "category": "Snacks & Confectionery",
+    "product_type": "food",
+    "ingredients": [
+      "Chickpea Flour",
+      "Vegetable Oil (Cottonseed & Palm)",
+      "Puffed Rice",
+      "Green Peas",
+      "Peanuts",
+      "Corn Flakes",
+      "Cashew Nuts",
+      "Sesame Seeds",
+      "Iodized Salt",
+      "Spices"
+    ],
+    "allergens": [
+      "Peanuts",
+      "Tree Nuts",
+      "Sesame Seeds"
+    ],
+    "shelf_life_days": 180,
+    "storage": "pantry",
+    "source": "Open Food Facts"
+  }
+]

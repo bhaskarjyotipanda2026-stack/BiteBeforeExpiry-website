@@ -1,0 +1,196 @@
+[
+  {
+    "id": "other_001",
+    "barcode": "8901030090124",
+    "product_name": "Surf Excel Matic Front Load Liquid Detergent",
+    "brand": "Surf Excel",
+    "category": "Household & Cleaning",
+    "product_type": "other",
+    "ingredients": [
+      "Anionic Surfactants",
+      "Non-ionic Surfactants",
+      "Optical Brighteners",
+      "Fragrance",
+      "Preservatives"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Retail Catalog"
+  },
+  {
+    "id": "other_002",
+    "barcode": "8901030099882",
+    "product_name": "Vim Dishwash Gel Lemon Anti-Bacterial",
+    "brand": "Vim",
+    "category": "Household & Cleaning",
+    "product_type": "other",
+    "ingredients": [
+      "Sodium Alkyl Benzene Sulphonate",
+      "Sodium Laureth Sulphate",
+      "Lemon Extracts",
+      "Preservative"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Retail Catalog"
+  },
+  {
+    "id": "other_003",
+    "barcode": "8901030788112",
+    "product_name": "Colgate Total 12HR Antibacterial Toothpaste",
+    "brand": "Colgate",
+    "category": "Personal Care & Hygiene",
+    "product_type": "other",
+    "ingredients": [
+      "Sodium Fluoride (1450 ppm)",
+      "Zinc Phosphate",
+      "Hydrated Silica",
+      "Sorbitol",
+      "Glycerin",
+      "Sodium Lauryl Sulfate",
+      "Flavor"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Retail Catalog"
+  },
+  {
+    "id": "other_004",
+    "barcode": "8901030611221",
+    "product_name": "Dove Daily Moisture Shampoo with Nutri-Oils",
+    "brand": "Dove",
+    "category": "Personal Care & Hygiene",
+    "product_type": "other",
+    "ingredients": [
+      "Water",
+      "Sodium Laureth Sulfate",
+      "Dimethiconol",
+      "Cocamidopropyl Betaine",
+      "Fragrance",
+      "Citric Acid"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Retail Catalog"
+  },
+  {
+    "id": "other_005",
+    "barcode": "8901030554128",
+    "product_name": "Harpic Power Plus 10X Toilet Cleaner Original",
+    "brand": "Harpic",
+    "category": "Household & Cleaning",
+    "product_type": "other",
+    "ingredients": [
+      "Hydrochloric Acid 10.5%",
+      "Hydroxyethyl Oleylamine",
+      "Cetyl Trimethyl Ammonium Chloride",
+      "Methyl Salicylate",
+      "Acid Blue 80"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Retail Catalog"
+  },
+  {
+    "id": "other_006",
+    "barcode": "8901030441229",
+    "product_name": "Comfort After Wash Morning Fresh Fabric Conditioner",
+    "brand": "Comfort",
+    "category": "Household & Cleaning",
+    "product_type": "other",
+    "ingredients": [
+      "Cationic Surfactants",
+      "Fragrance",
+      "Pearling Agent",
+      "Silicone",
+      "Preservative"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Retail Catalog"
+  },
+  {
+    "id": "other_007",
+    "barcode": "8901030332215",
+    "product_name": "Savlon Moisture Shield Germ Protection Liquid Handwash",
+    "brand": "Savlon",
+    "category": "Personal Care & Hygiene",
+    "product_type": "other",
+    "ingredients": [
+      "Aqua",
+      "Sodium Laureth Sulfate",
+      "Cocamidopropyl Betaine",
+      "Glycol Distearate",
+      "Benzalkonium Chloride",
+      "Parfum"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Retail Catalog"
+  },
+  {
+    "id": "other_008",
+    "barcode": "8901030221190",
+    "product_name": "Dettol Original Bathing Soap Bar with Antibacterial Actives",
+    "brand": "Dettol",
+    "category": "Personal Care & Hygiene",
+    "product_type": "other",
+    "ingredients": [
+      "Sodium Palmate",
+      "Sodium Palm Kernelate",
+      "Aqua",
+      "Parfum",
+      "Chloroxylenol",
+      "Glycerin",
+      "Titanium Dioxide"
+    ],
+    "allergens": [],
+    "shelf_life_days": 1095,
+    "storage": "pantry",
+    "source": "Retail Catalog"
+  },
+  {
+    "id": "other_009",
+    "barcode": "8901030119983",
+    "product_name": "Lizol Disinfectant Surface Cleaner Citrus",
+    "brand": "Lizol",
+    "category": "Household & Cleaning",
+    "product_type": "other",
+    "ingredients": [
+      "Benzalkonium Chloride Solution 4% w/w",
+      "Aqua",
+      "Lauryl Alcohol Ethoxylate",
+      "Citrus Fragrance",
+      "CI 19140"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Retail Catalog"
+  },
+  {
+    "id": "other_010",
+    "barcode": "8901030110027",
+    "product_name": "Hit Cockroach Killer Spray with Deep Reach Nozzle",
+    "brand": "Hit",
+    "category": "Household & Cleaning",
+    "product_type": "other",
+    "ingredients": [
+      "Cypermethrin 0.1% w/w",
+      "Imiprothrin 0.07% w/w",
+      "LPG Propellant",
+      "Solvent Base"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Retail Catalog"
+  }
+]

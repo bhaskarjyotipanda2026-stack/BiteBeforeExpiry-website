@@ -7,9 +7,12 @@
  * 3. Comprehensive Product Lifespan & Shelf Life Analysis (Total lifespan, remaining lifespan, PAO after opening, storage protocols)
  */
 
-import { extractExpiryDate, extractMfgDate, extractIngredients, inferProductType, extractProductName } from './parserService';
-import { fetchFromOpenFDA, COMPREHENSIVE_MEDICINE_DATABASE } from './medicineDatasetService';
-import { parseGs1Barcode } from './barcodeScannerService';
+import { 
+  extractExpiryDate, extractMfgDate, extractIngredients, inferProductType, extractProductName,
+  extractBatchNumber, extractBrand, extractNutritionInfo, calculateBestBeforeFromMfg 
+} from './parserService.js';
+import { fetchFromOpenFDA, COMPREHENSIVE_MEDICINE_DATABASE } from './medicineDatasetService.js';
+import { parseGs1Barcode } from './barcodeScannerService.js';
 
 // Open Food Facts API Base URLs
 const OFF_API_PRODUCT_URL = 'https://world.openfoodfacts.org/api/v2/product';
@@ -332,6 +335,17 @@ function normalizeOffProduct(product, rawQuery) {
     });
   }
 
+  // Extract nutrition facts
+  const nutriments = product.nutriments || {};
+  const nutrition = {
+    energy: nutriments['energy-kcal_100g'] ? `${nutriments['energy-kcal_100g']} kcal` : (nutriments['energy_100g'] ? `${nutriments['energy_100g']} kJ` : null),
+    protein: nutriments.proteins_100g !== undefined ? `${nutriments.proteins_100g} g` : null,
+    carbs: nutriments.carbohydrates_100g !== undefined ? `${nutriments.carbohydrates_100g} g` : null,
+    fat: nutriments.fat_100g !== undefined ? `${nutriments.fat_100g} g` : null,
+    sugar: nutriments.sugars_100g !== undefined ? `${nutriments.sugars_100g} g` : null,
+    sodium: nutriments.sodium_100g !== undefined ? `${nutriments.sodium_100g} g` : (nutriments.salt_100g !== undefined ? `${nutriments.salt_100g} g (salt)` : null)
+  };
+
   return {
     source: 'Open Food Facts Database',
     barcode: product.code || rawQuery,
@@ -342,6 +356,7 @@ function normalizeOffProduct(product, rawQuery) {
     ingredientsList: ingredients.slice(0, 15),
     allergens: allergens,
     additives: additives,
+    nutrition: (nutrition.energy || nutrition.protein || nutrition.carbs || nutrition.fat) ? nutrition : null,
     expirationDateRaw: product.expiration_date || null,
     conservationConditions: product.conservation_conditions || '',
     origins: product.origins || product.manufacturing_places || 'Agricultural Supply Chain',
@@ -596,12 +611,18 @@ export async function detectProductIntelligence({
   // 2. Real Expiry & Manufacturing Date Detection
   const ocrExpDate = extractExpiryDate(combinedText);
   const ocrMfgDate = extractMfgDate(combinedText);
+  const ocrBatchNumber = extractBatchNumber(combinedText);
+  const ocrBrand = extractBrand(combinedText);
+  const ocrNutrition = extractNutritionInfo(combinedText);
 
-  let realExpiryDate = existingExpiryDate || ocrExpDate || null;
+  let realExpiryDate = existingExpiryDate || null;
   let realMfgDate = existingMfgDate || ocrMfgDate || null;
-  let batchNumber = null;
-  let isRealPrintedExpiry = false;
-  let detectionSource = 'Optical Package OCR';
+  let batchNumber = ocrBatchNumber || null;
+  let isRealPrintedExpiry = !!existingExpiryDate;
+  let isCalculatedDate = false;
+  let calculationNote = null;
+  let bestBeforePeriod = null;
+  let detectionSource = existingExpiryDate ? 'Existing Item Record' : 'Optical Package OCR';
   let confidence = 'high';
 
   // A. Check GS1 Barcode identifiers (DataMatrix / GS1-128 AI 17 & AI 11)
@@ -623,6 +644,19 @@ export async function detectProductIntelligence({
     isRealPrintedExpiry = true;
     detectionSource = 'Verified Package Optical Stamp';
     confidence = 'high';
+  }
+
+  // B.2 Check Best Before calculation from MFG if actual EXP was not explicitly printed
+  if (!realExpiryDate && (realMfgDate || ocrMfgDate)) {
+    const calcResult = calculateBestBeforeFromMfg(realMfgDate || ocrMfgDate, combinedText);
+    if (calcResult) {
+      realExpiryDate = calcResult.calculatedExpiryDate;
+      isCalculatedDate = true;
+      calculationNote = calcResult.calculationNote;
+      bestBeforePeriod = calcResult.bestBeforePeriod;
+      detectionSource = 'Calculated from MFG + Best Before';
+      confidence = 'medium';
+    }
   }
 
   // C. Check Medicine Dataset Active Batch Dates
@@ -754,7 +788,8 @@ export async function detectProductIntelligence({
       activeCompounds: medicineData.activeIngredients || [],
       drugClass: medicineData.drugClass,
       dosageForm: medicineData.dosageForm,
-      indications: medicineData.indications
+      indications: medicineData.indications,
+      ingredients: medicineData.activeIngredients || []
     };
   } else {
     const ingredientsList = offData?.ingredientsList?.length > 0 
@@ -767,6 +802,7 @@ export async function detectProductIntelligence({
       combinedText,
       offData
     );
+    composition.ingredients = ingredientsList;
   }
 
   // 4. Product Lifespan & Shelf Life
@@ -792,11 +828,19 @@ export async function detectProductIntelligence({
   }
 
   const determinedType = medicineData ? 'medicine' : (offData ? 'grocery' : inferProductType(combinedText));
+  const brand = offData?.brands || ocrBrand || medicineData?.manufacturer || (cleanBarcode && KNOWN_FOOD_BATCH_PROFILES[cleanBarcode]?.brand) || null;
+  const category = offData?.categories?.split(',')[0]?.trim() || (medicineData ? 'Tablets & Capsules' : 'Other Grocery');
+  const nutritionInfo = ocrNutrition || offData?.nutrition || null;
 
   return {
     verifiedName: resolvedName,
+    brand,
+    category,
     barcode: cleanBarcode || medicineData?.barcode || offData?.barcode || null,
     productType: determinedType,
+    batchNumber: batchNumber || ocrBatchNumber || null,
+    nutritionInfo,
+    ingredients: composition?.ingredients || extractIngredients(combinedText),
     openFoodFactsData: offData,
     medicineData: medicineData,
     realDatasetSource: medicineData?.source || (offData ? 'Open Food Facts Database' : null),
@@ -807,8 +851,11 @@ export async function detectProductIntelligence({
       mfgDate: realMfgDate,
       formattedHumanDate,
       formattedHumanMfgDate,
-      batchNumber,
+      batchNumber: batchNumber || ocrBatchNumber || null,
       isRealPrintedExpiry,
+      isCalculatedDate,
+      calculationNote,
+      bestBeforePeriod,
       confidence,
       detectionSource,
       daysRemaining,
@@ -822,3 +869,133 @@ export async function detectProductIntelligence({
     lifespan
   };
 }
+
+/**
+ * Barcode + OCR Fusion Engine
+ * 
+ * Fuses Generic Product Data (from Barcode lookup) with Package-Specific Data (from OCR label)
+ * Detects conflicts between barcode catalog and printed label.
+ * Tracks field-level provenance ('barcode', 'ocr', 'barcode+ocr', 'calculated', 'manual').
+ */
+export function fuseBarcodeAndOcr({ barcodeData = {}, ocrData = {} }) {
+  const conflicts = [];
+  const provenance = {};
+
+  // 1. Brand Resolution & Conflict Check
+  let brand = ocrData.brand || barcodeData.brand || null;
+  if (barcodeData.brand && ocrData.brand) {
+    const b1 = barcodeData.brand.trim().toLowerCase();
+    const b2 = ocrData.brand.trim().toLowerCase();
+    if (b1 !== b2 && !b1.includes(b2) && !b2.includes(b1)) {
+      conflicts.push({
+        field: 'brand',
+        barcodeValue: barcodeData.brand,
+        ocrValue: ocrData.brand,
+        message: 'Information conflict detected. Please verify.'
+      });
+      provenance.brand = 'barcode+ocr (conflict)';
+    } else {
+      provenance.brand = 'barcode+ocr';
+    }
+  } else if (ocrData.brand) {
+    provenance.brand = 'ocr';
+  } else if (barcodeData.brand) {
+    provenance.brand = 'barcode';
+  }
+
+  // 2. Product Name Resolution
+  const bName = barcodeData.name || barcodeData.product_name;
+  let name = bName || ocrData.name || 'Scanned Product';
+  if (bName && ocrData.name && ocrData.name !== 'Scanned Product' && ocrData.name !== 'Scanned Grocery' && ocrData.name !== 'Scanned Medicine') {
+    provenance.name = 'barcode+ocr';
+  } else if (bName) {
+    provenance.name = 'barcode';
+  } else {
+    provenance.name = 'ocr';
+  }
+
+
+  // 3. Expiry Date Resolution & Conflict Check (Printed EXP has priority)
+  let expiryDate = ocrData.expiryDate || barcodeData.expiryDate || null;
+  let isCalculatedDate = ocrData.isCalculatedDate || false;
+  let calculationNote = ocrData.calculationNote || null;
+  let bestBeforePeriod = ocrData.bestBeforePeriod || null;
+
+  if (barcodeData.expiryDate && ocrData.expiryDate && barcodeData.expiryDate !== ocrData.expiryDate) {
+    conflicts.push({
+      field: 'expiryDate',
+      barcodeValue: barcodeData.expiryDate,
+      ocrValue: ocrData.expiryDate,
+      message: 'Information conflict detected. Please verify.'
+    });
+    // In safety rules, explicit printed package EXP has priority, but flagged for user verification
+    expiryDate = ocrData.expiryDate;
+    provenance.expiryDate = 'ocr (conflict with barcode)';
+  } else if (isCalculatedDate) {
+    provenance.expiryDate = 'calculated';
+  } else if (ocrData.expiryDate) {
+    provenance.expiryDate = 'ocr';
+  } else if (barcodeData.expiryDate) {
+    provenance.expiryDate = 'barcode';
+  } else {
+    provenance.expiryDate = 'none';
+  }
+
+  // 4. Manufacturing Date & Batch Number (Package-Specific)
+  const mfgDate = ocrData.mfgDate || barcodeData.mfgDate || null;
+  provenance.mfgDate = ocrData.mfgDate ? 'ocr' : (barcodeData.mfgDate ? 'barcode' : 'none');
+
+  const batchNumber = ocrData.batchNumber || barcodeData.batchNumber || null;
+  provenance.batchNumber = ocrData.batchNumber ? 'ocr' : (barcodeData.batchNumber ? 'barcode' : 'none');
+
+  // 5. Ingredients & Nutrition Resolution
+  let ingredients = [];
+  if (ocrData.ingredientsOriginal && ocrData.ingredientsOriginal.length > 0) {
+    ingredients = ocrData.ingredientsOriginal;
+    provenance.ingredients = barcodeData.ingredients?.length > 0 ? 'barcode+ocr' : 'ocr';
+  } else if (barcodeData.ingredients && barcodeData.ingredients.length > 0) {
+    ingredients = barcodeData.ingredients;
+    provenance.ingredients = 'barcode';
+  } else {
+    provenance.ingredients = 'none';
+  }
+
+  const nutritionInfo = ocrData.nutritionInfo || barcodeData.nutritionInfo || barcodeData.nutrition || null;
+  provenance.nutrition = ocrData.nutritionInfo ? 'ocr' : (barcodeData.nutritionInfo ? 'barcode' : 'none');
+
+  const conflictDetected = conflicts.length > 0;
+
+  return {
+    name,
+    brand,
+    barcode: barcodeData.barcode || ocrData.barcode || null,
+    type: barcodeData.type || ocrData.type || 'grocery',
+    category: barcodeData.category || ocrData.category || 'Other Grocery',
+    expiryDate,
+    mfgDate,
+    batchNumber,
+    bestBeforePeriod,
+    isCalculatedDate,
+    calculationNote,
+    ingredients,
+    nutritionInfo,
+    storageInfo: ocrData.storageInfo || null,
+    warnings: ocrData.warnings || [],
+    rawOcrText: ocrData.rawOcrText || '',
+    confidenceScore: ocrData.confidenceScore || (barcodeData.barcode ? 90 : 70),
+    fieldConfidences: ocrData.fieldConfidences || {
+      expiry: expiryDate ? 95 : 0,
+      mfg: mfgDate ? 90 : 0,
+      batch: batchNumber ? 90 : 0,
+      ingredients: ingredients.length > 0 ? 92 : 0,
+      brand: brand ? 90 : 0
+    },
+    conflictDetected,
+    hasConflict: conflictDetected,
+    conflicts,
+    conflictMessage: conflictDetected ? 'Information conflict detected. Please verify.' : null,
+    provenance,
+    sourceOfInfo: (barcodeData.barcode && (ocrData.rawOcrText || ocrData.expiryDate)) ? 'barcode+ocr' : (barcodeData.barcode ? 'barcode' : 'ocr')
+  };
+}
+

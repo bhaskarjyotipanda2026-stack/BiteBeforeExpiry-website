@@ -1,15 +1,31 @@
 import React, { useState, useMemo } from 'react';
 import { 
   Search, Filter, Plus, ScanLine, AlertTriangle, CheckCircle2, 
-  Sparkles, RefreshCw, ArrowUpDown, ShieldCheck, HeartPulse, ShoppingBasket, ChefHat
+  Sparkles, RefreshCw, ArrowUpDown, ShieldCheck, HeartPulse, ShoppingBasket, ChefHat,
+  Bell, Clock, Calendar, BellRing, AlertOctagon
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { ItemCard } from './ItemCard';
 import { ItemDetailModal } from './ItemDetailModal';
+import { PersonalizedPantrySection } from './PersonalizedPantrySection';
+
+function formatExpiryDate(dateStr) {
+  if (!dateStr) return 'No Date';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+  } catch (_) {
+    return dateStr;
+  }
+}
 
 export function DashboardScreen({ onNavigateToScan, onNavigateToRecipes, onOpenUndatedModal, initialFilter = 'all' }) {
   const { 
     items, 
+    wasteRecords = [],
+    userScans = [],
+    userReminders = [],
     getItemUrgency, 
     getDaysRemaining, 
     markAsUsed, 
@@ -36,6 +52,74 @@ export function DashboardScreen({ onNavigateToScan, onNavigateToRecipes, onOpenU
       }).length
     };
   }, [items, settings.notificationLeadDays]);
+
+  // Backend & Scan KPI calculations
+  const kpiStats = useMemo(() => {
+    const activeItems = items.filter(i => i.status !== 'used' && i.status !== 'wasted');
+    const total = userScans.length > 0 ? userScans.length : items.length;
+    let active = 0;
+    let expiringSoon = 0;
+    let expired = 0;
+
+    activeItems.forEach(i => {
+      const days = getDaysRemaining(i.expiryDate);
+      if (days === null) {
+        active++;
+      } else if (days <= 0) {
+        expired++;
+      } else if (days <= 7) {
+        expiringSoon++;
+      } else {
+        active++;
+      }
+    });
+
+    return { total, active, expiringSoon, expired };
+  }, [items, userScans, getDaysRemaining]);
+
+  // Reminder Status and upcoming expiry tracking
+  const reminderItems = useMemo(() => {
+    return items
+      .filter(i => i.status !== 'used' && i.status !== 'wasted' && i.expiryDate)
+      .map(item => {
+        const days = getDaysRemaining(item.expiryDate);
+        let statusText = 'Active';
+        let statusBadge = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300';
+        let reminderText = `${days} days remaining`;
+
+        if (days <= 0) {
+          statusText = 'Expired';
+          statusBadge = 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border-rose-300';
+          reminderText = days === 0 ? 'Expires Today' : `Expired ${Math.abs(days)}d ago`;
+        } else if (days <= 7) {
+          statusText = 'Expiring Soon';
+          statusBadge = 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300';
+          reminderText = `${days} day${days === 1 ? '' : 's'} remaining`;
+        }
+
+        const rem = userReminders.find(r => r.scan_id === item.id);
+
+        return {
+          id: item.id,
+          name: item.name.toUpperCase(),
+          rawName: item.name,
+          category: item.type === 'medicine' ? 'MEDICINE' : (item.category || 'FOOD').toUpperCase(),
+          expiryDate: item.expiryDate,
+          formattedExpiry: formatExpiryDate(item.expiryDate),
+          statusText,
+          statusBadge,
+          reminderText,
+          notificationStatus: rem?.notification_status || (days <= 7 ? 'pending' : 'scheduled'),
+          itemRef: item
+        };
+      })
+      .sort((a, b) => {
+        const dA = a.expiryDate ? new Date(a.expiryDate).getTime() : 9999999999999;
+        const dB = b.expiryDate ? new Date(b.expiryDate).getTime() : 9999999999999;
+        return dA - dB;
+      })
+      .slice(0, 4);
+  }, [items, userReminders, getDaysRemaining]);
 
   // Filtered and sorted items
   const displayItems = useMemo(() => {
@@ -127,6 +211,126 @@ export function DashboardScreen({ onNavigateToScan, onNavigateToRecipes, onOpenU
         </div>
       </div>
 
+      {/* BACKEND KPI METRICS (Total Scanned, Active, Expiring Soon, Expired) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center space-x-3.5">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 font-bold">
+            <ScanLine className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Total Scanned
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+              {kpiStats.total}
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center space-x-3.5">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 font-bold">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Active Products
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
+              {kpiStats.active}
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center space-x-3.5">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 font-bold">
+            <AlertTriangle className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Expiring Soon
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400">
+              {kpiStats.expiringSoon}
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center space-x-3.5">
+          <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 font-bold">
+            <AlertOctagon className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Expired
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-rose-600 dark:text-rose-400">
+              {kpiStats.expired}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* AUTOMATIC EXPIRY REMINDER STATUS & UPCOMING EXPIRIES WIDGET */}
+      {reminderItems.length > 0 && (
+        <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <BellRing className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-pulse" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+                  Automatic Expiry Reminders & Upcoming Timeline
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Scheduled notifications: 7 days, 3 days, 1 day before, and upon expiry
+                </p>
+              </div>
+            </div>
+            <span className="text-[11px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 hidden sm:inline-block">
+              Auto Reminders Active
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {reminderItems.map(item => (
+              <div
+                key={item.id}
+                onClick={() => setSelectedItem(item.itemRef)}
+                className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-850/60 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-slate-200/60 dark:border-slate-750 transition-all cursor-pointer flex items-center justify-between gap-3"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <span className="font-black text-sm text-slate-900 dark:text-white tracking-wide">
+                      {item.name}
+                    </span>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                      {item.category}
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-600 dark:text-slate-300 flex items-center space-x-2">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Expires: <strong>{item.formattedExpiry}</strong></span>
+                  </div>
+                </div>
+
+                <div className="text-right space-y-1">
+                  <div>
+                    <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border ${item.statusBadge}`}>
+                      Status: {item.statusText}
+                    </span>
+                  </div>
+                  <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-end space-x-1">
+                    <Clock className="w-3 h-3 text-indigo-500" />
+                    <span>Reminder: {item.reminderText}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Expiring Ingredients Cooking Callout Banner */}
       {counts.urgent > 0 && onNavigateToRecipes && (
         <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-md shadow-orange-500/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -152,6 +356,14 @@ export function DashboardScreen({ onNavigateToScan, onNavigateToRecipes, onOpenU
           </button>
         </div>
       )}
+
+      {/* Personalized AI Pantry Section */}
+      <PersonalizedPantrySection
+        items={items}
+        wasteRecords={wasteRecords}
+        userProfile={{ allergies: settings.userAllergies || [] }}
+        onItemClick={(it) => setSelectedItem(it)}
+      />
 
       {/* Urgency Color Legend */}
       <div className="mb-6 p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">

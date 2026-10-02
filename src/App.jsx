@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from './context/AppContext';
+import { useAuth } from './context/AuthContext';
+import { ROLE_CONFIGS } from './services/roleService';
 import { Header } from './components/common/Header';
 import { NotificationBanner } from './components/common/NotificationBanner';
 import { ScanScreen } from './components/scan/ScanScreen';
@@ -11,20 +13,50 @@ import { StreaksScreen } from './components/streaks/StreaksScreen';
 import { ImpactStatsScreen } from './components/stats/ImpactStatsScreen';
 import { SettingsScreen } from './components/settings/SettingsScreen';
 import { RecipeAndReuseScreen } from './components/recipes/RecipeAndReuseScreen';
+import { HouseholdExpiryScreen } from './components/household/HouseholdExpiryScreen';
+import { BusinessModeScreen } from './components/business/BusinessModeScreen';
+import { MedicineInventoryScreen } from './components/medicine/MedicineInventoryScreen';
+import { DonationTraceabilityScreen } from './components/donation/DonationTraceabilityScreen';
+import { RecallAndBatchHub } from './components/recalls/RecallAndBatchHub';
+import { GovernmentDataScreen } from './components/government/GovernmentDataScreen';
+import { OfflineStatusBar } from './components/offline/OfflineStatusBar';
+import { RegionalVoiceAssistantModal } from './components/voice/RegionalVoiceAssistantModal';
 import { ActiveAlarmModal } from './components/common/ActiveAlarmModal';
+import { AuthModal } from './components/auth/AuthModal';
+import { OnboardingFlow } from './components/onboarding/OnboardingFlow';
+import { RetailerDashboard } from './components/roles/RetailerDashboard';
+import { DistributorDashboard } from './components/roles/DistributorDashboard';
+import { PharmacyHospitalDashboard } from './components/roles/PharmacyHospitalDashboard';
+import { ManufacturerDashboard } from './components/roles/ManufacturerDashboard';
+import { AdminDashboard } from './components/roles/AdminDashboard';
+import { RoleSelectorModal } from './components/roles/RoleSelectorModal';
 import { ShieldAlert, CheckCircle2, Info, Sparkles, Heart } from 'lucide-react';
 
 export function App() {
   const { toast, activeAlarmItem, dismissAlarm } = useApp();
+  const { activeRole, isRoleModalOpen, setIsRoleModalOpen } = useAuth();
 
   // Navigation tab state - landing on Scan Item screen per Core User Flow
-  const [activeTab, setActiveTab] = useState('scan'); // 'scan', 'dashboard', 'recipes', 'history', 'streaks', 'stats', 'settings'
+  const [activeTab, setActiveTab] = useState('scan'); // 'scan', 'dashboard', 'recipes', 'history', 'streaks', 'stats', 'settings', etc.
+
+  // Automatically switch tab when role changes
+  React.useEffect(() => {
+    const conf = ROLE_CONFIGS[activeRole];
+    if (conf && conf.defaultTab) {
+      setActiveTab(conf.defaultTab);
+    }
+  }, [activeRole]);
 
   // Scan workflow state
   const [scanResult, setScanResult] = useState(null);
 
   // Undated item modal state
   const [undatedModalData, setUndatedModalData] = useState({ isOpen: false, data: null });
+
+  // Auth, Onboarding and Regional Voice modals
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [isVoiceAssistantOpen, setIsVoiceAssistantOpen] = useState(false);
 
   // Handle OCR scan completion
   const handleAnalysisComplete = (result) => {
@@ -37,9 +69,13 @@ export function App() {
     setUndatedModalData({ isOpen: true, data: initialData });
   };
 
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans text-slate-800 dark:text-slate-100 antialiased selection:bg-emerald-500 selection:text-white transition-colors duration-200">
       
+      {/* Offline / Low-Internet Mode & Resilient Queue Sync Bar */}
+      <OfflineStatusBar />
+
       {/* Persistent Notification Banner (Expiring soon alerts based on settings) */}
       <NotificationBanner
         onSelectTab={(tab) => setActiveTab(tab)}
@@ -54,7 +90,11 @@ export function App() {
           if (tab !== 'scan') setScanResult(null); // Reset scan result view if moving away
         }}
         onOpenUndatedModal={() => handleOpenUndatedModal({})}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
+        onOpenOnboarding={() => setIsOnboardingOpen(true)}
+        onOpenVoiceAssistant={() => setIsVoiceAssistantOpen(true)}
       />
+
 
       {/* Main Content Area */}
       <main className="flex-1 pb-16">
@@ -89,6 +129,99 @@ export function App() {
             onNavigateToRecipes={() => setActiveTab('recipes')}
             onOpenUndatedModal={() => handleOpenUndatedModal({})}
           />
+        )}
+
+        {/* Tab 2b: Household Expiry & Food Waste Reduction */}
+        {activeTab === 'household' && (
+          <HouseholdExpiryScreen
+            onNavigateToScan={() => {
+              setScanResult(null);
+              setActiveTab('scan');
+            }}
+            onNavigateToRecipes={() => setActiveTab('recipes')}
+          />
+        )}
+
+        {/* Role Tab: Retailer & Shopkeeper Portal */}
+        {activeTab === 'retailer_dash' && (
+          <RetailerDashboard
+            onNavigateToScan={() => {
+              setScanResult(null);
+              setActiveTab('scan');
+            }}
+            onNavigateToBusiness={() => setActiveTab('business')}
+          />
+        )}
+
+        {/* Role Tab: Wholesaler & Distributor Logistics */}
+        {activeTab === 'distributor_dash' && (
+          <DistributorDashboard
+            onNavigateToScan={() => {
+              setScanResult(null);
+              setActiveTab('scan');
+            }}
+          />
+        )}
+
+        {/* Role Tab: Pharmacy, Clinic & Hospital Portal */}
+        {activeTab === 'pharmacy_dash' && (
+          <PharmacyHospitalDashboard
+            onNavigateToScan={() => {
+              setScanResult(null);
+              setActiveTab('scan');
+            }}
+            onNavigateToMedicine={() => setActiveTab('medicine')}
+          />
+        )}
+
+        {/* Role Tab: Manufacturer Master Console */}
+        {activeTab === 'manufacturer_dash' && (
+          <ManufacturerDashboard
+            onNavigateToScan={() => {
+              setScanResult(null);
+              setActiveTab('scan');
+            }}
+          />
+        )}
+
+        {/* Role Tab: Platform Governance Admin Console */}
+        {activeTab === 'admin_dash' && (
+          <AdminDashboard
+            onNavigateToScan={() => {
+              setScanResult(null);
+              setActiveTab('scan');
+            }}
+          />
+        )}
+
+        {/* Tab 2c: Business Mode (FEFO & Batch Inventory) */}
+        {activeTab === 'business' && (
+          <BusinessModeScreen />
+        )}
+
+        {/* Tab 2d: Medicine Expiry Management */}
+        {activeTab === 'medicine' && (
+          <MedicineInventoryScreen />
+        )}
+
+        {/* Tab 2e: Donations & Traceability */}
+        {activeTab === 'donations' && (
+          <DonationTraceabilityScreen />
+        )}
+
+        {/* Tab 2f: Recall Alerts, Batch Tracking & AI Waste Prediction Hub */}
+        {activeTab === 'recalls_batches' && (
+          <RecallAndBatchHub
+            onNavigateToScan={() => {
+              setScanResult(null);
+              setActiveTab('scan');
+            }}
+          />
+        )}
+
+        {/* Tab 2g: Official Government Regulations & Food Safety Standards */}
+        {activeTab === 'gov_data' && (
+          <GovernmentDataScreen />
         )}
 
         {/* Tab 3: Recipes & Post-Expiry Actions */}
@@ -129,6 +262,39 @@ export function App() {
         onSaved={(item) => {
           setActiveTab('dashboard');
         }}
+      />
+
+      {/* User Authentication Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onStartOnboarding={() => {
+          setIsAuthModalOpen(false);
+          setIsOnboardingOpen(true);
+        }}
+      />
+
+
+      {/* Onboarding Setup Wizard */}
+      <OnboardingFlow
+        isOpen={isOnboardingOpen}
+        onClose={() => setIsOnboardingOpen(false)}
+        onCompleteToPantry={(item) => {
+          setActiveTab('dashboard');
+        }}
+      />
+
+
+      {/* Regional Language & Multilingual Voice Assistant Modal */}
+      <RegionalVoiceAssistantModal
+        isOpen={isVoiceAssistantOpen}
+        onClose={() => setIsVoiceAssistantOpen(false)}
+      />
+
+      {/* Stakeholder Role Selection Modal */}
+      <RoleSelectorModal
+        isOpen={isRoleModalOpen}
+        onClose={() => setIsRoleModalOpen(false)}
       />
 
       {/* Active Audible Expiry Alarm Modal */}

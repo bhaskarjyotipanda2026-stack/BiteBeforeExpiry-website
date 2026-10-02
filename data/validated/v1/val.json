@@ -1,0 +1,145 @@
+[
+  {
+    "id": "food_006",
+    "barcode": "8901030383783",
+    "product_name": "Kissan Fresh Tomato Ketchup",
+    "brand": "Kissan",
+    "category": "Condiments & Sauces",
+    "product_type": "food",
+    "ingredients": [
+      "water",
+      "tomato paste",
+      "sugar",
+      "salt",
+      "acidity regulator",
+      "thickeners (1422, 415)",
+      "preservative",
+      "spices & condiments"
+    ],
+    "allergens": [],
+    "shelf_life_days": 365,
+    "storage": "pantry",
+    "source": "Open Food Facts",
+    "feature_text": "Kissan Fresh Tomato Ketchup Kissan water tomato paste sugar salt acidity regulator thickeners (1422, 415) preservative spices & condiments Condiments & Sauces"
+  },
+  {
+    "id": "food_007",
+    "barcode": "8901063141121",
+    "product_name": "Mother Dairy Classic Curd / Dahi",
+    "brand": "Mother Dairy",
+    "category": "Dairy & Milk Products",
+    "product_type": "food",
+    "ingredients": [
+      "pasteurized toned milk",
+      "active lactic culture"
+    ],
+    "allergens": [
+      "Milk & Dairy"
+    ],
+    "shelf_life_days": 15,
+    "storage": "fridge",
+    "source": "Open Food Facts",
+    "feature_text": "Mother Dairy Classic Curd / Dahi Mother Dairy pasteurized toned milk active lactic culture Dairy & Milk Products"
+  },
+  {
+    "id": "food_009",
+    "barcode": "8901396115013",
+    "product_name": "Tata Salt Vacuum Evaporated Iodised Salt",
+    "brand": "Tata",
+    "category": "Condiments & Sauces",
+    "product_type": "food",
+    "ingredients": [
+      "edible common salt",
+      "potassium iodate",
+      "anticaking agent"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "pantry",
+    "source": "Open Food Facts",
+    "feature_text": "Tata Salt Vacuum Evaporated Iodised Salt Tata edible common salt potassium iodate anticaking agent Condiments & Sauces"
+  },
+  {
+    "id": "med_008",
+    "barcode": "8901148112028",
+    "product_name": "Moov Pain Relief Specialist Ointment 25g",
+    "brand": "Reckitt Benckiser",
+    "category": "Topical & Ointments",
+    "product_type": "medicine",
+    "ingredients": [
+      "oil of wintergreen (methyl salicylate) 15%",
+      "mint extract (pudina ka phool) 5%",
+      "turpentine oil 3%",
+      "eucalyptus oil 2%",
+      "ointment base q.s."
+    ],
+    "allergens": [],
+    "shelf_life_days": 1095,
+    "storage": "medicine_cabinet_external_only",
+    "source": "OpenFDA",
+    "feature_text": "Moov Pain Relief Specialist Ointment 25g Reckitt Benckiser oil of wintergreen (methyl salicylate) 15% mint extract (pudina ka phool) 5% turpentine oil 3% eucalyptus oil 2% ointment base q.s. Topical & Ointments"
+  },
+  {
+    "id": "med_022",
+    "barcode": "8901088051214",
+    "product_name": "Avil 25mg Pheniramine Maleate Tablets",
+    "brand": "Sanofi",
+    "category": "Tablets & Capsules",
+    "product_type": "medicine",
+    "ingredients": [
+      "pheniramine maleate 25mg",
+      "lactose",
+      "starch",
+      "talc"
+    ],
+    "allergens": [],
+    "shelf_life_days": 1825,
+    "storage": "medicine_cabinet_protect_light",
+    "source": "OpenFDA",
+    "feature_text": "Avil 25mg Pheniramine Maleate Tablets Sanofi pheniramine maleate 25mg lactose starch talc Tablets & Capsules"
+  },
+  {
+    "id": "med_003",
+    "barcode": "8901148201012",
+    "product_name": "Benadryl Cough Syrup Diphenhydramine 50ml",
+    "brand": "Johnson & Johnson",
+    "category": "Syrups & Suspensions",
+    "product_type": "medicine",
+    "ingredients": [
+      "diphenhydramine hydrochloride 14.08mg",
+      "ammonium chloride 138mg",
+      "sodium citrate 57.03mg",
+      "menthol 0.973mg",
+      "sucrose",
+      "glycerin",
+      "sodium benzoate"
+    ],
+    "allergens": [],
+    "shelf_life_days": 730,
+    "storage": "medicine_cabinet_protect_from_light",
+    "source": "OpenFDA",
+    "feature_text": "Benadryl Cough Syrup Diphenhydramine 50ml Johnson & Johnson diphenhydramine hydrochloride 14.08mg ammonium chloride 138mg sodium citrate 57.03mg menthol 0.973mg sucrose glycerin sodium benzoate Syrups & Suspensions"
+  },
+  {
+    "id": "other_008",
+    "barcode": "8901030221190",
+    "product_name": "Dettol Original Bathing Soap Bar with Antibacterial Actives",
+    "brand": "Dettol",
+    "category": "Personal Care & Hygiene",
+    "product_type": "other",
+    "ingredients": [
+      "sodium palmate",
+      "sodium palm kernelate",
+      "aqua",
+      "parfum",
+      "chloroxylenol",
+      "glycerin",
+      "titanium dioxide"
+    ],
+    "allergens": [],
+    "shelf_life_days": 1095,
+    "storage": "pantry",
+    "source": "Retail Catalog",
+    "feature_text": "Dettol Original Bathing Soap Bar with Antibacterial Actives Dettol sodium palmate sodium palm kernelate aqua parfum chloroxylenol glycerin titanium dioxide Personal Care & Hygiene"
+  }
+]

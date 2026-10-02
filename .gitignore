@@ -41,6 +41,9 @@ lerna-debug.log*
 # OS generated files
 .DS_Store
 Thumbs.db
+*.log
+test_screenshots/
+test_screenshots_part2/
 
 # Android / Gradle artifacts
 .gradle
@@ -49,3 +52,4 @@ Thumbs.db
 .externalNativeBuild
 .cxx
 local.properties
+

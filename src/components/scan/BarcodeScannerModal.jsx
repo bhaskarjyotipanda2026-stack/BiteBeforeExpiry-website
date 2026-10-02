@@ -409,6 +409,8 @@ export function BarcodeScannerModal({ isOpen, onClose, onBarcodeDetected }) {
               {filteredSamples.map((sample, idx) => (
                 <button
                   key={idx}
+                  id={`btn-sample-barcode-${sample.code}`}
+                  data-testid="barcode-sample-btn"
                   onClick={() => handleBarcodeSuccess(sample.code)}
                   className="p-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-600 text-left transition-all group flex items-start space-x-2 shadow-xs"
                 >

@@ -1,22 +1,46 @@
-import React from 'react';
 import { 
   Sparkles, Flame, Plus, ShieldCheck, Moon, Sun, ScanLine, 
-  LayoutDashboard, History, Award, BarChart3, Settings, ChefHat 
+  LayoutDashboard, History, Award, BarChart3, Settings, ChefHat,
+  User, Compass, Home, Building2, Pill, HeartHandshake, ShieldAlert,
+  Mic, Landmark, Truck, Factory
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
+import { RoleBadgeDropdown } from '../roles/RoleBadgeDropdown';
 
-export function Header({ activeTab, setActiveTab, onOpenUndatedModal }) {
+export function Header({ 
+  activeTab, 
+  setActiveTab, 
+  onOpenUndatedModal, 
+  onOpenAuthModal, 
+  onOpenOnboarding,
+  onOpenVoiceAssistant
+}) {
   const { stats, settings, isDarkMode, toggleDarkMode } = useApp();
+  const { user, isAuthenticated, activeRole } = useAuth();
 
-  const navItems = [
+  const allNavItems = [
     { id: 'scan', label: 'Scan & Add', icon: ScanLine },
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'recipes', label: 'Recipes & Reuse', icon: ChefHat },
+    { id: 'household', label: 'Household (USE-FIRST)', icon: Home, roles: ['NORMAL_USER', 'ADMIN'] },
+    { id: 'retailer_dash', label: 'Retailer Portal', icon: Building2, roles: ['SHOPKEEPER', 'ADMIN'] },
+    { id: 'distributor_dash', label: activeRole === 'WHOLESALER' ? 'Wholesaler Hub' : 'Distributor Logistics', icon: Truck, roles: ['WHOLESALER', 'DISTRIBUTOR', 'ADMIN'] },
+    { id: 'pharmacy_dash', label: activeRole === 'HOSPITAL' ? 'Hospital Pharmacy' : activeRole === 'CLINIC' ? 'Clinic Meds' : 'Pharmacy Portal', icon: Pill, roles: ['PHARMACY', 'CLINIC', 'HOSPITAL', 'ADMIN'] },
+    { id: 'manufacturer_dash', label: 'Manufacturer Console', icon: Factory, roles: ['MANUFACTURER', 'ADMIN'] },
+    { id: 'admin_dash', label: 'Governance Console', icon: ShieldCheck, roles: ['ADMIN'] },
+    { id: 'dashboard', label: 'Pantry Dashboard', icon: LayoutDashboard },
+    { id: 'business', label: 'FEFO Inventory', icon: Building2, roles: ['SHOPKEEPER', 'WHOLESALER', 'DISTRIBUTOR', 'MANUFACTURER', 'ADMIN'] },
+    { id: 'medicine', label: 'Medicine Safety', icon: Pill, roles: ['NORMAL_USER', 'PHARMACY', 'CLINIC', 'HOSPITAL', 'ADMIN'] },
+    { id: 'donations', label: 'Donations & Traceability', icon: HeartHandshake },
+    { id: 'recalls_batches', label: 'Recalls & AI Risk', icon: ShieldAlert },
+    { id: 'gov_data', label: 'Govt Regulations', icon: Landmark },
+    { id: 'recipes', label: 'Recipes & Reuse', icon: ChefHat, roles: ['NORMAL_USER', 'ADMIN'] },
     { id: 'history', label: 'Scan History', icon: History },
-    { id: 'streaks', label: 'Streaks & Badges', icon: Award },
+    { id: 'streaks', label: 'Streaks & Badges', icon: Award, roles: ['NORMAL_USER', 'ADMIN'] },
     { id: 'stats', label: 'Impact Stats', icon: BarChart3 },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
+
+  const navItems = allNavItems.filter(item => !item.roles || item.roles.includes(activeRole));
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors duration-200">
@@ -46,9 +70,12 @@ export function Header({ activeTab, setActiveTab, onOpenUndatedModal }) {
             </div>
           </div>
 
-          {/* Action Center: Streak badge + Theme toggle + Add item manual + Scan shortcut */}
+          {/* Action Center: Role Switcher + Streak badge + Voice + Theme toggle + Add item manual */}
           <div className="flex items-center space-x-2 sm:space-x-2.5">
             
+            {/* Stakeholder Role Badge & Quick Switcher */}
+            <RoleBadgeDropdown />
+
             {/* Streak Counter Button */}
             <button
               onClick={() => setActiveTab('streaks')}
@@ -58,6 +85,38 @@ export function Header({ activeTab, setActiveTab, onOpenUndatedModal }) {
               <span className="text-base animate-bounce">🔥</span>
               <span className="tracking-tight">{stats.currentStreak || 1}</span>
               <span className="text-xs font-semibold text-amber-700 dark:text-amber-400 hidden sm:inline">Days</span>
+            </button>
+
+            {/* Regional Voice Assistant Trigger */}
+            <button
+              onClick={onOpenVoiceAssistant}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800/60 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-300 font-bold text-xs hover:border-indigo-400 transition-all shadow-xs"
+              title="Regional Voice Assistant (English, हिन्दी, ଓଡ଼ିଆ, বাংলা)"
+            >
+              <Mic className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 animate-pulse" />
+              <span className="hidden sm:inline">AI Voice</span>
+            </button>
+
+            {/* Setup Wizard / Onboarding Shortcut */}
+            <button
+              onClick={onOpenOnboarding}
+              className="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-teal-200 dark:border-teal-800/60 bg-teal-50/70 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 font-bold text-xs hover:border-teal-400 transition-all shadow-xs"
+              title="Launch Setup Wizard (Account -> Profile -> Allergies -> First Scan -> Add to Pantry)"
+            >
+              <Compass className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+              <span>Wizard</span>
+            </button>
+
+            {/* User Account / Auth Modal Trigger */}
+            <button
+              onClick={onOpenAuthModal}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all shadow-xs"
+              title="Account & Database Profile"
+            >
+              <div className="w-4 h-4 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-[10px] font-black">
+                {user?.name ? user.name[0].toUpperCase() : 'U'}
+              </div>
+              <span className="max-w-[70px] sm:max-w-[90px] truncate">{user?.name ? user.name.split(' ')[0] : 'Sign In'}</span>
             </button>
 
             {/* Dark & Light Mode Toggle Button */}
@@ -99,6 +158,7 @@ export function Header({ activeTab, setActiveTab, onOpenUndatedModal }) {
             </button>
           </div>
         </div>
+
 
         {/* Navigation Tabs Bar */}
         <nav className="flex space-x-1 overflow-x-auto scrollbar-none py-1 border-t border-slate-100 dark:border-slate-800">
