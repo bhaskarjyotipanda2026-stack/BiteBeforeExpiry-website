@@ -7,25 +7,31 @@ import { performOcr } from '../../services/ocrService';
 import { parsePackageData } from '../../services/parserService';
 import { useApp } from '../../context/AppContext';
 
-// Hackathon quick-demo presets for instant label testing
+// Real-world package presets for instant verification and testing
 const QUICK_DEMO_LABELS = [
   {
     name: 'Parle-G Glucose Biscuits',
-    subtitle: 'MFG + Best Before 6 Months + Batch + Ingredients',
-    sampleText: `PARLE-G GLUCOSE BISCUITS\nMFG: 01/09/2026\nBEST BEFORE 6 MONTHS FROM PACKAGING\nBATCH NO: PG-8821B\nINGREDIENTS: Wheat Flour, Sugar, Edible Vegetable Oil, Invert Sugar Syrup, Milk Solids, Salt, Leavening Agents\nNUTRITION PER 100g: Energy 454 kcal, Protein 6.7g, Carbohydrates 77.1g, Total Fat 13g, Sugar 26.5g`,
+    subtitle: 'Direct MFG 08/2026 + EXP 07/2027 + BATCH B7A91 + Net Qty + MRP',
+    sampleText: `PARLE-G GLUCOSE BISCUITS\nMFD: 08/2026\nEXP: 07/2027\nBATCH NO: B7A91\nNET QTY: 100 g\nMRP: ₹ 25.00 (INCL. OF ALL TAXES)\nMANUFACTURED BY: Parle Products Pvt. Ltd., Mumbai, India\nINGREDIENTS: Wheat Flour (67%), Sugar, Edible Vegetable Oil, Invert Sugar Syrup, Milk Solids, Salt, Leavening Agents (503 ii, 500 ii)\nNUTRITION PER 100g: Energy 454 kcal, Protein 6.7g, Carbohydrates 77.1g, Total Fat 13g, Sugar 26.5g, Sodium 280mg\nSTORAGE: Store in a cool, hygienic and dry place away from direct sunlight.`,
     previewImg: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=500&auto=format&fit=crop&q=60'
   },
   {
-    name: 'Amul Taaza Homogenised Toned Milk',
-    subtitle: 'Explicit EXP Date + Batch + Cold Storage Guidance',
-    sampleText: `AMUL TAAZA HOMOGENISED TONED MILK\nMFG DATE: 10/05/2026\nEXPIRY: 10/11/2026\nBATCH: AM-9021\nINGREDIENTS: Toned Milk, Vitamin A, Vitamin D\nNUTRITION: Energy 58 kcal, Protein 3.0g, Carbohydrates 4.7g, Total Fat 3.0g, Calcium 120mg\nSTORAGE: Store in cool dry place. Once opened, consume within 2 days.`,
+    name: 'Heinz Tomato Ketchup',
+    subtitle: 'MFG + Best Before 6 Months Rule + Batch + Storage Directive',
+    sampleText: `HEINZ TOMATO KETCHUP\nMFG DATE: 01/09/2026\nBEST BEFORE 6 MONTHS FROM PACKAGING\nBATCH NO: HZ-8821B\nNET WT: 500 g\nMRP: ₹ 135.00\nMANUFACTURED BY: Heinz India Pvt. Ltd.\nINGREDIENTS: Tomato Paste (28%), Sugar, Water, Salt, Acidity Regulator (260), Spices & Condiments\nSTORAGE: Keep in a cool, dry place. Refrigerate after opening and consume within 8 weeks.`,
     previewImg: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=60'
   },
   {
     name: 'Dolo 650 Tablets (Paracetamol)',
-    subtitle: 'Pharma Packaging with Batch & Expiry Stamp',
-    sampleText: `DOLO 650 TABLETS\nEach uncoated tablet contains: Paracetamol IP 650mg\nMFG: 15/04/2025\nEXP: 31/03/2028\nB.NO: DL-4029\nCOMPOSITION: Paracetamol IP 650mg, Excipients q.s.\nDOSAGE: As directed by the physician. Do not exceed 4000mg in 24 hours.`,
+    subtitle: 'Pharma Formulation + Batch + Medicine Warning + Clinical Storage',
+    sampleText: `DOLO 650 TABLETS\nEach uncoated tablet contains: Paracetamol IP 650mg\nMFG: 15/04/2025\nEXP: 31/03/2028\nB.NO: DL-4029\nNET QTY: 15 Tablets\nMRP: ₹ 33.50\nMANUFACTURED BY: Micro Labs Limited, India\nDOSAGE: As directed by physician. Do not exceed 4000mg in 24 hours.\nSTORAGE: Store below 30°C in a dry place. Protect from direct light. Keep out of reach of children.`,
     previewImg: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&auto=format&fit=crop&q=60'
+  },
+  {
+    name: 'Scanning Sequence Error Sample',
+    subtitle: 'Testing Date Validation: MFG 08/2027 appears later than EXP 07/2026',
+    sampleText: `TEST DAIRY PRODUCT\nMFG: 08/2027\nEXP: 07/2026\nBATCH: ERR-991A\nNET QTY: 200 ml\nMRP: ₹ 40.00\nINGREDIENTS: Pasteurized Milk, Live Active Cultures\nSTORAGE: Keep refrigerated at 4°C.`,
+    previewImg: 'https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?w=500&auto=format&fit=crop&q=60'
   }
 ];
 

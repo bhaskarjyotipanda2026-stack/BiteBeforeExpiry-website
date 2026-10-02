@@ -95,8 +95,8 @@ export function extractExpiryDate(text) {
 
   // Specific lookups for expiry keywords
   const expKeywords = [
-    /(?:exp(?:iry)?\.?\s*(?:date)?|use\s*by|best\s*before|consume\s*before|bbd?|val(?:idity)?)[:\s\-]*([0-9a-zA-Z\/\.\-\s]{4,22})/i,
-    /(?:expires|expiry)[:\s\-]*([0-9a-zA-Z\/\.\-\s]{4,22})/i
+    /(?:exp(?:iry)?\.?\s*(?:date)?|use\s*by|best\s*before|consume\s*before|bbd?|val(?:idity)?|exd)[:\s\-]*([0-9a-zA-Z\/\.\-]{4,14})\b/i,
+    /(?:expires|expiry)[:\s\-]*([0-9a-zA-Z\/\.\-]{4,14})\b/i
   ];
 
   for (const regex of expKeywords) {
@@ -110,12 +110,31 @@ export function extractExpiryDate(text) {
   // Fallback: search lines containing EXP or Best Before
   const lines = text.split('\n');
   for (const line of lines) {
-    if (/\b(?:exp|best\s*before|use\s*by|consume\s*before)\b/i.test(line)) {
+    if (/\b(?:exp|best\s*before|use\s*by|consume\s*before|exd)\b/i.test(line)) {
       const parsed = normalizeDate(line);
       if (parsed) return parsed;
     }
   }
 
+  return null;
+}
+
+/**
+ * Extracts raw printed expiry date string directly from packaging text
+ */
+export function extractRawExpiryDateString(text) {
+  if (!text) return null;
+  const expKeywords = [
+    /(?:exp(?:iry)?\.?\s*(?:date)?|use\s*by|best\s*before|consume\s*before|bbd?|val(?:idity)?|exd)[:\s\-]*([0-9a-zA-Z\/\.\-]{4,14})\b/i,
+    /(?:expires|expiry)[:\s\-]*([0-9a-zA-Z\/\.\-]{4,14})\b/i
+  ];
+  for (const regex of expKeywords) {
+    const match = text.match(regex);
+    if (match && match[1]) {
+      const candidate = match[1].trim();
+      if (normalizeDate(candidate)) return candidate;
+    }
+  }
   return null;
 }
 
@@ -126,7 +145,7 @@ export function extractMfgDate(text) {
   if (!text) return null;
 
   const mfgKeywords = [
-    /(?:mfg|mfd|manufactured|packed\s*on|pkd|date\s*of\s*mfg|mfg\s*date)[:\s\-]*([0-9a-zA-Z\/\.\-\s]{4,22})/i
+    /(?:mfg|mfd|manufactured|packed\s*on|pkd|date\s*of\s*mfg|mfg\s*date|date\s*of\s*manufacture)[:\s\-]*([0-9a-zA-Z\/\.\-]{4,14})\b/i
   ];
 
   for (const regex of mfgKeywords) {
@@ -146,6 +165,24 @@ export function extractMfgDate(text) {
     }
   }
 
+  return null;
+}
+
+/**
+ * Extracts raw printed manufacturing date string directly from packaging text
+ */
+export function extractRawMfgDateString(text) {
+  if (!text) return null;
+  const mfgKeywords = [
+    /(?:mfg|mfd|manufactured|packed\s*on|pkd|date\s*of\s*mfg|mfg\s*date|date\s*of\s*manufacture)[:\s\-]*([0-9a-zA-Z\/\.\-]{4,14})\b/i
+  ];
+  for (const regex of mfgKeywords) {
+    const match = text.match(regex);
+    if (match && match[1]) {
+      const candidate = match[1].trim();
+      if (normalizeDate(candidate)) return candidate;
+    }
+  }
   return null;
 }
 
@@ -190,7 +227,7 @@ export function calculateBestBeforeFromMfg(mfgDate, text) {
         return {
           calculatedExpiryDate: iso,
           bestBeforePeriod: `${count} ${unit}`,
-          calculationNote: 'Calculated from MFG + Best Before'
+          calculationNote: `Calculated from MFG (${mfgDate}) + Best Before ${count} ${unit} rule printed on packaging`
         };
       } catch (err) {
         console.warn('Date calculation error:', err);
@@ -208,7 +245,7 @@ export function extractBatchNumber(text) {
   if (!text) return null;
 
   const batchKeywords = [
-    /(?:batch(?:\s*no\.?|\s*number)?|lot(?:\s*no\.?|\s*number)?|b\.no\.?|b\/no\.?|batch|lot)[:\s\-#]*([A-Za-z0-9\-_]{2,20})\b/i,
+    /(?:batch(?:\s*no\.?|\s*number|\s*code)?|lot(?:\s*no\.?|\s*number|\s*code)?|b\.no\.?|b\/no\.?|batch|lot)[:\s\-#]*([A-Za-z0-9\-_]{2,20})\b/i,
     /\b(?:b\.?\s*no\.?\s*[:\-]?\s*)([A-Za-z0-9\-_]{2,20})\b/i
   ];
 
@@ -225,6 +262,168 @@ export function extractBatchNumber(text) {
 
   return null;
 }
+
+/**
+ * Extracts Net Quantity / Pack Size from package text
+ */
+export function extractNetQuantity(text) {
+  if (!text) return null;
+  const qtyPatterns = [
+    /(?:net\s*(?:quantity|qty|wt\.?|weight|vol\.?|volume)|pack\s*size|contents?)[:\s\-]*([0-9\.]+\s*(?:g|kg|ml|l|ltr|litres?|tablets?|capsules?|sachets?|pieces?|pcs|oz|fl\s*oz))\b/i,
+    /\b([0-9\.]+\s*(?:g|kg|ml|l|ltr|tablets?|capsules?|sachets?))\b/i
+  ];
+  for (const regex of qtyPatterns) {
+    const match = text.match(regex);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+  }
+  return null;
+}
+
+/**
+ * Extracts Maximum Retail Price (MRP) from package text
+ */
+export function extractMrp(text) {
+  if (!text) return null;
+  const mrpPatterns = [
+    /(?:m\.?r\.?p\.?|max(?:imum)?\s*retail\s*price|mrp\s*rs\.?)[:\s\-]*([₹Rs\.]*\s*[0-9]+(?:\.[0-9]{2})?)/i,
+    /(?:rs\.?|₹)\s*([0-9]+(?:\.[0-9]{2})?)/i
+  ];
+  for (const regex of mrpPatterns) {
+    const match = text.match(regex);
+    if (match && (match[1] || match[0])) {
+      const candidate = (match[1] || match[0]).trim();
+      return candidate.startsWith('₹') || candidate.toLowerCase().startsWith('rs') ? candidate : `₹ ${candidate}`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Extracts Manufacturer name & address from package text
+ */
+export function extractManufacturerInfo(text) {
+  if (!text) return null;
+  const mfgInfoPatterns = [
+    /(?:manufactured\s*by|mfd\s*by|mkt\s*by|marketed\s*by|packed\s*by|mfg\s*by)[:\s\-]*([^\r\n,;]{3,50})/i
+  ];
+  for (const regex of mfgInfoPatterns) {
+    const match = text.match(regex);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+  }
+  return null;
+}
+
+/**
+ * Extracts Market / Country of Origin from package text
+ */
+export function extractMarketCountry(text) {
+  if (!text) return null;
+  if (/\b(?:made\s*in\s*india|product\s*of\s*india|india)\b/i.test(text)) return 'India';
+  if (/\b(?:made\s*in\s*usa|product\s*of\s*usa|united\s*states)\b/i.test(text)) return 'United States';
+  if (/\b(?:made\s*in\s*uk|product\s*of\s*uk|united\s*kingdom)\b/i.test(text)) return 'United Kingdom';
+  if (/\b(?:made\s*in\s*germany|germany)\b/i.test(text)) return 'Germany';
+  return null;
+}
+
+/**
+ * Validates date sequence between Manufacturing Date and Expiry Date
+ * Returns error if MFG date is after Expiry date
+ */
+export function validateDateSequence(mfgDate, expiryDate) {
+  if (!mfgDate || !expiryDate) {
+    return {
+      isValid: true,
+      status: 'VERIFIED',
+      message: 'Date recorded'
+    };
+  }
+  try {
+    const mfg = new Date(mfgDate);
+    const exp = new Date(expiryDate);
+    if (!isNaN(mfg.getTime()) && !isNaN(exp.getTime())) {
+      if (exp < mfg) {
+        return {
+          isValid: false,
+          status: 'NEEDS REVIEW',
+          message: 'Possible scanning error. Manufacturing date appears later than expiry date.'
+        };
+      }
+    }
+  } catch (_) {}
+  return {
+    isValid: true,
+    status: 'VERIFIED',
+    message: '✓ Date sequence valid'
+  };
+}
+
+/**
+ * Real Expiry Status Engine: computes status strictly from verified expiry date
+ * Statuses: FRESH, EXPIRING SOON, EXPIRING TODAY, EXPIRED, DATE NOT VERIFIED
+ */
+export function calculateRealExpiryStatus(expiryDate) {
+  if (!expiryDate) {
+    return {
+      status: 'DATE NOT VERIFIED',
+      label: 'Date Not Verified',
+      badgeClass: 'bg-slate-500 text-white',
+      daysRemaining: null,
+      displayText: 'Date Not Verified'
+    };
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const exp = new Date(expiryDate);
+  exp.setHours(0, 0, 0, 0);
+  if (isNaN(exp.getTime())) {
+    return {
+      status: 'DATE NOT VERIFIED',
+      label: 'Date Not Verified',
+      badgeClass: 'bg-slate-500 text-white',
+      daysRemaining: null,
+      displayText: 'Date Not Verified'
+    };
+  }
+  const diffDays = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) {
+    return {
+      status: 'EXPIRED',
+      label: 'Expired',
+      badgeClass: 'bg-rose-600 text-white',
+      daysRemaining: diffDays,
+      displayText: `${Math.abs(diffDays)} days expired`
+    };
+  } else if (diffDays === 0) {
+    return {
+      status: 'EXPIRING TODAY',
+      label: 'Expiring Today',
+      badgeClass: 'bg-rose-600 text-white',
+      daysRemaining: 0,
+      displayText: 'Expires Today'
+    };
+  } else if (diffDays <= 30) {
+    return {
+      status: 'EXPIRING SOON',
+      label: 'Expiring Soon',
+      badgeClass: 'bg-amber-500 text-white',
+      daysRemaining: diffDays,
+      displayText: `${diffDays} days remaining`
+    };
+  } else {
+    return {
+      status: 'FRESH',
+      label: 'Fresh',
+      badgeClass: 'bg-emerald-600 text-white',
+      daysRemaining: diffDays,
+      displayText: `${diffDays} days remaining`
+    };
+  }
+}
+
 
 /**
  * Extracts Brand Name from OCR text
@@ -570,12 +769,14 @@ export function parsePackageData(frontText = '', backText = '') {
 
   // 1. Direct printed Expiry Date extraction
   let expiryDate = extractExpiryDate(combinedText);
+  let rawExpiryDate = extractRawExpiryDateString(combinedText);
   let isCalculatedDate = false;
   let calculationNote = null;
   let bestBeforePeriod = null;
 
   // 2. Manufacturing Date extraction
   const mfgDate = extractMfgDate(combinedText);
+  const rawMfgDate = extractRawMfgDateString(combinedText);
 
   // 3. Date Calculation: If actual EXP not printed, but MFG + Best Before X months is printed
   if (!expiryDate && mfgDate) {
@@ -585,6 +786,7 @@ export function parsePackageData(frontText = '', backText = '') {
       isCalculatedDate = true;
       calculationNote = calcResult.calculationNote;
       bestBeforePeriod = calcResult.bestBeforePeriod;
+      rawExpiryDate = `${bestBeforePeriod} from ${rawMfgDate || mfgDate}`;
     }
   }
 
@@ -594,23 +796,37 @@ export function parsePackageData(frontText = '', backText = '') {
   // 5. Brand extraction
   const brand = extractBrand(combinedText);
 
-  // 6. Nutrition Information extraction
+  // 6. Net Quantity & MRP extraction
+  const netQuantity = extractNetQuantity(combinedText);
+  const mrp = extractMrp(combinedText);
+
+  // 7. Manufacturer & Country / Market extraction
+  const manufacturerInfo = extractManufacturerInfo(combinedText);
+  const countryOrMarket = extractMarketCountry(combinedText);
+
+  // 8. Nutrition Information extraction
   const nutritionInfo = extractNutritionInfo(combinedText);
 
-  // 7. Ingredients extraction
+  // 9. Ingredients extraction
   const ingredientsOriginal = extractIngredients(combinedText);
 
-  // 8. Storage information & Warnings
+  // 10. Storage information & Warnings
   const storageInfo = extractStorageInfo(combinedText);
   const warnings = extractWarnings(combinedText);
 
-  // 9. Type and Name inference
+  // 11. Type and Name inference
   const type = inferProductType(combinedText);
   const name = extractProductName(frontText || backText, type === 'medicine' ? 'Scanned Medicine' : 'Scanned Grocery');
 
-  // 10. Multiple dates detection & confidence assessment
+  // 12. Multiple dates detection & confidence assessment
   const allDates = extractAllDates(combinedText);
   const hasMultipleDates = allDates.length > 2 && !expiryDate;
+
+  // 13. Date sequence validation (EXP >= MFG)
+  const dateValidation = validateDateSequence(mfgDate, expiryDate);
+
+  // 14. Real Expiry Status calculation
+  const realExpiryStatus = calculateRealExpiryStatus(expiryDate);
 
   // Field level confidences
   const { confidenceScore, fieldConfidences, fieldConfidenceAlerts } = calculateFieldConfidences({
@@ -632,6 +848,10 @@ export function parsePackageData(frontText = '', backText = '') {
     confidence = 'none';
     requiresVerification = true;
     verificationReason = 'Expiry date not detected on label.';
+  } else if (!dateValidation.isValid) {
+    confidence = 'low';
+    requiresVerification = true;
+    verificationReason = dateValidation.message;
   } else if (hasMultipleDates) {
     confidence = 'low';
     requiresVerification = true;
@@ -641,19 +861,53 @@ export function parsePackageData(frontText = '', backText = '') {
   } else if (confidenceScore < 70) {
     confidence = 'low';
     requiresVerification = true;
-    verificationReason = 'Detected by OCR — Please verify.';
+    verificationReason = 'Expiry date could not be read reliably. Please rescan the expiry area.';
   }
+
+  // Explicit anti-fabrication labels
+  const expiryDateLabel = expiryDate 
+    ? (isCalculatedDate ? 'Expiry Date — Calculated from Package Rule' : 'Expiry Date — Read from Package')
+    : 'Not available';
+  const mfgDateLabel = mfgDate ? 'Manufacturing Date — Read from Package' : 'Not available';
+  const batchNumberLabel = batchNumber ? 'Batch/Lot — Read from Package' : 'Not available';
+
+  // Field verification statuses
+  const fieldVerificationStatuses = {
+    productName: name && name !== 'Scanned Product' && name !== 'Scanned Grocery' && name !== 'Scanned Medicine' ? 'HIGH CONFIDENCE' : 'NEEDS REVIEW',
+    brand: brand ? 'VERIFIED' : 'NOT FOUND',
+    expiryDate: expiryDate ? (confidenceScore >= 70 && dateValidation.isValid ? 'VERIFIED' : 'NEEDS REVIEW') : 'NOT FOUND',
+    mfgDate: mfgDate ? 'VERIFIED' : 'NOT FOUND',
+    batchNumber: batchNumber ? 'VERIFIED' : 'NOT FOUND',
+    netQuantity: netQuantity ? 'VERIFIED' : 'NOT FOUND',
+    mrp: mrp ? 'VERIFIED' : 'NOT FOUND',
+    ingredients: ingredientsOriginal.length > 0 ? 'VERIFIED' : 'NOT FOUND',
+    nutritionInfo: nutritionInfo ? 'VERIFIED' : 'SOURCE UNAVAILABLE',
+    storageInfo: storageInfo ? 'VERIFIED' : 'SOURCE UNAVAILABLE',
+    manufacturerInfo: manufacturerInfo ? 'VERIFIED' : 'SOURCE UNAVAILABLE',
+    countryOrMarket: countryOrMarket ? 'VERIFIED' : 'SOURCE UNAVAILABLE'
+  };
 
   return {
     name,
     brand,
     type,
     expiryDate,
+    rawExpiryDate,
+    expiryDateLabel,
     mfgDate,
+    rawMfgDate,
+    mfgDateLabel,
     isCalculatedDate,
     calculationNote,
     bestBeforePeriod,
     batchNumber,
+    batchNumberLabel,
+    netQuantity,
+    mrp,
+    manufacturerInfo,
+    countryOrMarket,
+    dateValidation,
+    realExpiryStatus,
     nutritionInfo,
     ingredientsOriginal,
     storageInfo,
@@ -664,6 +918,7 @@ export function parsePackageData(frontText = '', backText = '') {
     confidenceScore,
     fieldConfidences,
     fieldConfidenceAlerts,
+    fieldVerificationStatuses,
     requiresVerification,
     verificationReason,
     source: 'ocr',
@@ -673,7 +928,11 @@ export function parsePackageData(frontText = '', backText = '') {
       expiryDate: isCalculatedDate ? 'calculated' : (expiryDate ? 'ocr' : 'none'),
       mfgDate: mfgDate ? 'ocr' : 'none',
       batchNumber: batchNumber ? 'ocr' : 'none',
-      ingredients: ingredientsOriginal?.length > 0 ? 'ocr' : 'none'
+      netQuantity: netQuantity ? 'ocr' : 'none',
+      mrp: mrp ? 'ocr' : 'none',
+      ingredients: ingredientsOriginal?.length > 0 ? 'ocr' : 'none',
+      storageInfo: storageInfo ? 'ocr' : 'none',
+      manufacturerInfo: manufacturerInfo ? 'ocr' : 'none'
     }
   };
 }

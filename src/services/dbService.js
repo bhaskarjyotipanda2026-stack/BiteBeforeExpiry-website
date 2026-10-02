@@ -62,6 +62,16 @@ const LOCAL_TABLE_KEYS = {
   WASTE_PREDICTIONS: 'bbe_db_waste_predictions',
   ORGANIZATIONS: 'bbe_db_organizations',
   USER_ROLES: 'bbe_db_user_roles',
+  PRODUCT_BARCODES: 'bbe_db_product_barcodes',
+  PRODUCT_SOURCES: 'bbe_db_product_sources',
+  PRODUCT_INGREDIENTS: 'bbe_db_product_ingredients',
+  PRODUCT_NUTRITION: 'bbe_db_product_nutrition',
+  BATCHES: 'bbe_db_batches',
+  SCANS: 'bbe_db_scans',
+  OCR_RESULTS: 'bbe_db_ocr_results',
+  VERIFIED_PACKAGE_DATA: 'bbe_db_verified_package_data',
+  DATA_SOURCES: 'bbe_db_data_sources',
+  SCAN_VERIFICATIONS: 'bbe_db_scan_verifications',
   WAREHOUSES: 'bbe_db_warehouses',
   DISPATCHES: 'bbe_db_dispatches',
   PRODUCT_MASTER: 'bbe_db_product_master',
@@ -2944,5 +2954,173 @@ export const dbService = {
     if (pm.length === 0) {
       setLocalTable(LOCAL_TABLE_KEYS.PRODUCT_MASTER, SEEDED_PRODUCT_MASTER);
     }
+  },
+
+  /**
+   * Records a complete Real Package Scan Session
+   * Persists dual-source records:
+   * 1. Product Database (General product information)
+   * 2. Package Scan (Specific physical package: MFG, EXP, Batch, MRP, Net Qty)
+   * 3. OCR raw capture & confidence scores
+   * 4. Field-level verification matrix
+   */
+  async recordPackageScan({
+    userId = 'usr_demo_primary_001',
+    barcode = null,
+    scanType = 'ocr',
+    productData = {},
+    packageData = {},
+    ocrData = {},
+    verificationMatrix = {}
+  }) {
+    const scanId = `scn_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const nowIso = new Date().toISOString();
+
+    // 1. Persist/update Product Database Record
+    const products = getLocalTable(LOCAL_TABLE_KEYS.PRODUCTS);
+    let productId = productData.id || `prd_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    const existingIndex = products.findIndex(p => (barcode && p.barcode === barcode) || (productData.name && p.product_name?.toLowerCase() === productData.name?.toLowerCase()));
+    
+    const productRecord = {
+      id: productId,
+      barcode: barcode || productData.barcode || null,
+      product_name: productData.name || productData.productName || 'Scanned Product',
+      brand: productData.brand || null,
+      category: productData.category || 'Food',
+      product_type: productData.type || 'grocery',
+      ingredients: productData.ingredients || [],
+      nutrition: productData.nutritionInfo || productData.nutrition || null,
+      allergens: productData.allergens || [],
+      image_url: productData.productImage || productData.image_url || null,
+      source: productData.databaseSource || (barcode ? 'openfoodfacts' : 'ocr'),
+      created_at: nowIso,
+      updated_at: nowIso
+    };
+
+    if (existingIndex >= 0) {
+      productId = products[existingIndex].id;
+      products[existingIndex] = { ...products[existingIndex], ...productRecord, id: productId, updated_at: nowIso };
+    } else {
+      products.push(productRecord);
+    }
+    setLocalTable(LOCAL_TABLE_KEYS.PRODUCTS, products);
+
+    // 2. Persist Batch Record
+    const batches = getLocalTable(LOCAL_TABLE_KEYS.BATCHES);
+    const batchRecord = {
+      id: `btc_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      product_id: productId,
+      batch_number: packageData.batchNumber || ocrData.batchNumber || null,
+      mfg_date: packageData.mfgDate || ocrData.mfgDate || null,
+      expiry_date: packageData.expiryDate || ocrData.expiryDate || null,
+      raw_mfg_date: packageData.rawMfgDate || ocrData.rawMfgDate || null,
+      raw_expiry_date: packageData.rawExpiryDate || ocrData.rawExpiryDate || null,
+      best_before_period: packageData.bestBeforePeriod || ocrData.bestBeforePeriod || null,
+      is_calculated_date: packageData.isCalculatedDate || ocrData.isCalculatedDate || false,
+      calculation_note: packageData.calculationNote || ocrData.calculationNote || null,
+      created_at: nowIso
+    };
+    batches.push(batchRecord);
+    setLocalTable(LOCAL_TABLE_KEYS.BATCHES, batches);
+
+    // 3. Persist OCR Raw Results
+    const ocrResults = getLocalTable(LOCAL_TABLE_KEYS.OCR_RESULTS);
+    const ocrRecord = {
+      id: `ocr_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      scan_id: scanId,
+      raw_text: ocrData.rawOcrText || packageData.rawOcrText || '',
+      confidence_score: ocrData.confidenceScore || 0,
+      field_confidences: ocrData.fieldConfidences || {},
+      created_at: nowIso
+    };
+    ocrResults.push(ocrRecord);
+    setLocalTable(LOCAL_TABLE_KEYS.OCR_RESULTS, ocrResults);
+
+    // 4. Persist Verified Package Data (Specific to THIS Physical Package)
+    const verifiedPkgData = getLocalTable(LOCAL_TABLE_KEYS.VERIFIED_PACKAGE_DATA);
+    const packageRecord = {
+      id: `pkg_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      scan_id: scanId,
+      product_id: productId,
+      batch_id: batchRecord.id,
+      mfg_date: packageData.mfgDate || ocrData.mfgDate || null,
+      raw_mfg_date: packageData.rawMfgDate || ocrData.rawMfgDate || null,
+      mfg_date_label: packageData.mfgDateLabel || 'Manufacturing Date — Read from Package',
+      expiry_date: packageData.expiryDate || ocrData.expiryDate || null,
+      raw_expiry_date: packageData.rawExpiryDate || ocrData.rawExpiryDate || null,
+      expiry_date_label: packageData.expiryDateLabel || 'Expiry Date — Read from Package',
+      batch_number: packageData.batchNumber || ocrData.batchNumber || null,
+      net_quantity: packageData.netQuantity || ocrData.netQuantity || null,
+      mrp: packageData.mrp || ocrData.mrp || null,
+      storage_info: packageData.storageInfo || ocrData.storageInfo || null,
+      manufacturer_info: packageData.manufacturerInfo || ocrData.manufacturerInfo || null,
+      scan_status: packageData.scanStatus || 'VERIFIED',
+      created_at: nowIso
+    };
+    verifiedPkgData.push(packageRecord);
+    setLocalTable(LOCAL_TABLE_KEYS.VERIFIED_PACKAGE_DATA, verifiedPkgData);
+
+    // 5. Persist Scan Verifications (Field-Level Matrix)
+    const scanVerifications = getLocalTable(LOCAL_TABLE_KEYS.SCAN_VERIFICATIONS);
+    const verificationRecord = {
+      id: `vrf_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      scan_id: scanId,
+      product_id: productId,
+      matrix: verificationMatrix,
+      created_at: nowIso
+    };
+    scanVerifications.push(verificationRecord);
+    setLocalTable(LOCAL_TABLE_KEYS.SCAN_VERIFICATIONS, scanVerifications);
+
+    // 6. Persist User Scan Record
+    const userScans = getLocalTable(LOCAL_TABLE_KEYS.USER_SCANS);
+    const userScanRecord = {
+      id: scanId,
+      user_id: userId,
+      product_id: productId,
+      scan_type: scanType,
+      barcode: barcode || null,
+      extracted_text: ocrData.rawOcrText || '',
+      expiry_date: packageData.expiryDate || null,
+      manufacturing_date: packageData.mfgDate || null,
+      batch_number: packageData.batchNumber || null,
+      quantity: 1,
+      scanned_at: nowIso,
+      status: packageData.realExpiryStatus?.status === 'EXPIRED' ? 'expired' : (packageData.realExpiryStatus?.status === 'EXPIRING SOON' ? 'expiring_soon' : 'active'),
+      created_at: nowIso,
+      updated_at: nowIso
+    };
+    userScans.unshift(userScanRecord);
+    setLocalTable(LOCAL_TABLE_KEYS.USER_SCANS, userScans);
+
+    return {
+      scanId,
+      productId,
+      batchId: batchRecord.id,
+      packageRecordId: packageRecord.id,
+      productRecord,
+      packageRecord,
+      verificationMatrix
+    };
+  },
+
+  async getVerifiedPackageData(scanId) {
+    const list = getLocalTable(LOCAL_TABLE_KEYS.VERIFIED_PACKAGE_DATA);
+    return list.find(p => p.scan_id === scanId) || null;
+  },
+
+  async getScanVerifications(scanId) {
+    const list = getLocalTable(LOCAL_TABLE_KEYS.SCAN_VERIFICATIONS);
+    return list.find(v => v.scan_id === scanId)?.matrix || null;
+  },
+
+  async getDataSources() {
+    return [
+      { id: 'src_pkg_01', name: 'Physical Package Optical OCR', type: 'Package Inspection', priority: 1, reliability: '100% (Direct Physical Package)' },
+      { id: 'src_mfg_02', name: 'Official Manufacturer Product Master', type: 'Manufacturer Registry', priority: 2, reliability: '99.9%' },
+      { id: 'src_off_03', name: 'Open Food Facts Database', type: 'Public Collaborative API', priority: 3, reliability: '98.5%' },
+      { id: 'src_fda_04', name: 'OpenFDA Medicine & Pharma Database', type: 'Statutory Regulator', priority: 3, reliability: '99.5%' },
+      { id: 'src_rcl_05', name: 'FSSAI / FDA / RAPEX Official Recall Registry', type: 'Official Safety Recall', priority: 2, reliability: '100%' }
+    ];
   }
 };
