@@ -6,6 +6,7 @@ import { Header } from './components/common/Header';
 import { NotificationBanner } from './components/common/NotificationBanner';
 import { ScanScreen } from './components/scan/ScanScreen';
 import { ResultsScreen } from './components/scan/ResultsScreen';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { UndatedItemModal } from './components/scan/UndatedItemModal';
 import { DashboardScreen } from './components/dashboard/DashboardScreen';
 import { ScanHistoryScreen } from './components/history/ScanHistoryScreen';
@@ -102,14 +103,16 @@ export function App() {
         {/* Tab 1: Scan & Add / Results Screen */}
         {activeTab === 'scan' && (
           scanResult ? (
-            <ResultsScreen
-              scanResult={scanResult}
-              onSaveComplete={(savedItem) => {
-                setScanResult(null);
-                setActiveTab('dashboard');
-              }}
-              onRetake={() => setScanResult(null)}
-            />
+            <ErrorBoundary onReset={() => setScanResult(null)}>
+              <ResultsScreen
+                scanResult={scanResult}
+                onSaveComplete={(savedItem) => {
+                  setScanResult(null);
+                  setActiveTab('dashboard');
+                }}
+                onRetake={() => setScanResult(null)}
+              />
+            </ErrorBoundary>
           ) : (
             <ScanScreen
               onAnalysisComplete={handleAnalysisComplete}
